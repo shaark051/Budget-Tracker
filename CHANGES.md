@@ -4,6 +4,15 @@ All notable changes and architectural overview for the **Apple x Notion Event Bu
 
 ---
 
+## [Unreleased]
+
+### Fixed
+- **Cloudflare Wrangler Deployment**:
+  - Configured `"not_found_handling": "single-page-application"` in `wrangler.jsonc` to support single-page application route fallback.
+  - Removed `public/_redirects` to resolve Cloudflare Wrangler asset validation error (infinite loop check).
+
+---
+
 ## [1.0.0] - 2025-04-15
 
 ### Initial Release Features
