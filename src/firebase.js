@@ -2,12 +2,13 @@ import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID
+  apiKey: "AIzaSyCMcNcko4jYEZPCQgxF62Rbscmj7Jvg4A8",
+  authDomain: "event-budget-tracker.firebaseapp.com",
+  projectId: "event-budget-tracker",
+  storageBucket: "event-budget-tracker.firebasestorage.app",
+  messagingSenderId: "652577315923",
+  appId: "1:652577315923:web:2261f9368c310af332faa6",
+  measurementId: "G-YBF0F1XFTK"
 };
 
 export const isFirebaseConfigured = Boolean(
