@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   Search,
   Plus,
@@ -8,6 +8,7 @@ import {
   Trash2,
   Filter,
   X,
+  FolderPlus,
   FileText,
   DollarSign,
   Calendar,
@@ -15,7 +16,7 @@ import {
   Tag
 } from 'lucide-react';
 import { CategoryBadge, StatusBadge, formatCurrency } from './Badges';
-import { DEFAULT_CATEGORIES, STATUS_OPTIONS } from '../services/store';
+import { DEFAULT_CATEGORIES, STATUS_OPTIONS, subscribeToCategories, addCategory } from '../services/store';
 
 export function ExpenseTable({
   currentEvent,
@@ -25,6 +26,18 @@ export function ExpenseTable({
   onDeleteExpense
 }) {
   const currency = currentEvent?.currency || 'USD';
+
+  // Categories state from store
+  const [categories, setCategories] = useState(DEFAULT_CATEGORIES);
+  const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
+  const [newCategoryLabel, setNewCategoryLabel] = useState('');
+
+  useEffect(() => {
+    const unsubscribe = subscribeToCategories((fetchedCats) => {
+      setCategories(fetchedCats);
+    });
+    return () => unsubscribe();
+  }, []);
 
   // Filters & Sorting state
   const [searchQuery, setSearchQuery] = useState('');
@@ -39,12 +52,23 @@ export function ExpenseTable({
 
   // Form Fields
   const [title, setTitle] = useState('');
-  const [category, setCategory] = useState(DEFAULT_CATEGORIES[0].label);
+  const [category, setCategory] = useState(categories[0]?.label || DEFAULT_CATEGORIES[0].label);
   const [amount, setAmount] = useState('');
   const [status, setStatus] = useState('Paid');
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [vendor, setVendor] = useState('');
   const [notes, setNotes] = useState('');
+
+  const handleCreateCategory = async (e) => {
+    e.preventDefault();
+    if (!newCategoryLabel.trim()) return;
+    const added = await addCategory({ label: newCategoryLabel.trim() });
+    if (added) {
+      setCategory(added.label);
+    }
+    setNewCategoryLabel('');
+    setIsCategoryModalOpen(false);
+  };
 
   const openAddModal = () => {
     setEditingExpense(null);
@@ -225,8 +249,8 @@ export function ExpenseTable({
             className="w-full px-3 py-2 text-xs bg-white dark:bg-[#191919] border border-[#E3E2E0] dark:border-[#2F2F2F] rounded-xl focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white text-[#37352F] dark:text-[#D4D4D4]"
           >
             <option value="ALL">All Categories</option>
-            {DEFAULT_CATEGORIES.map(cat => (
-              <option key={cat.id} value={cat.label}>{cat.label}</option>
+            {categories.map(cat => (
+              <option key={cat.id || cat.label} value={cat.label}>{cat.label}</option>
             ))}
           </select>
         </div>
@@ -340,6 +364,51 @@ export function ExpenseTable({
         </table>
       </div>
 
+      {/* Modal: Create New Category */}
+      {isCategoryModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white dark:bg-[#202020] border border-[#E3E2E0] dark:border-[#2F2F2F] rounded-2xl shadow-apple max-w-sm w-full p-5 space-y-4">
+            <div className="flex items-center justify-between pb-2 border-b border-[#E3E2E0] dark:border-[#2F2F2F]">
+              <h3 className="text-md font-semibold text-[#37352F] dark:text-[#D4D4D4] flex items-center space-x-2">
+                <FolderPlus className="w-4 h-4" />
+                <span>Create New Category</span>
+              </h3>
+              <button onClick={() => setIsCategoryModalOpen(false)} className="text-gray-400 hover:text-gray-600">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <form onSubmit={handleCreateCategory} className="space-y-3">
+              <div>
+                <label className="block text-xs font-medium text-gray-500 mb-1">Category Name</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. Security & Staffing"
+                  value={newCategoryLabel}
+                  onChange={(e) => setNewCategoryLabel(e.target.value)}
+                  className="w-full px-3 py-2 bg-[#F7F6F3] dark:bg-[#191919] border border-[#E3E2E0] dark:border-[#2F2F2F] rounded-lg focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white text-sm"
+                />
+              </div>
+              <div className="flex justify-end space-x-2 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setIsCategoryModalOpen(false)}
+                  className="px-3 py-1.5 rounded-lg text-xs border border-[#E3E2E0] dark:border-[#2F2F2F] hover:bg-[#F7F6F3] dark:hover:bg-[#2B2B2B]"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-3 py-1.5 rounded-lg text-xs bg-black text-white dark:bg-white dark:text-black font-medium hover:opacity-90 shadow-sm"
+                >
+                  Save Category
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       {/* Modal: Add/Edit Expense */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-in fade-in duration-200">
@@ -368,14 +437,24 @@ export function ExpenseTable({
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-medium text-gray-500 mb-1">Category</label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block text-xs font-medium text-gray-500">Category</label>
+                    <button
+                      type="button"
+                      onClick={() => setIsCategoryModalOpen(true)}
+                      className="text-[11px] text-blue-600 dark:text-blue-400 hover:underline flex items-center space-x-1"
+                    >
+                      <Plus className="w-3 h-3" />
+                      <span>New</span>
+                    </button>
+                  </div>
                   <select
                     value={category}
                     onChange={(e) => setCategory(e.target.value)}
                     className="w-full px-3 py-2 bg-[#F7F6F3] dark:bg-[#191919] border border-[#E3E2E0] dark:border-[#2F2F2F] rounded-lg focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white text-sm"
                   >
-                    {DEFAULT_CATEGORIES.map(cat => (
-                      <option key={cat.id} value={cat.label}>{cat.label}</option>
+                    {categories.map(cat => (
+                      <option key={cat.id || cat.label} value={cat.label}>{cat.label}</option>
                     ))}
                   </select>
                 </div>

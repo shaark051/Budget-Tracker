@@ -6,7 +6,13 @@ All notable changes and architectural overview for the **Apple x Notion Event Bu
 
 ## [Unreleased]
 
+### Added
+- **BDT Currency Support**: Added `BDT (৳)` option to currency selectors.
+- **Custom Expense Categories**: Added capability to dynamically create and assign custom expense categories.
+
 ### Fixed
+- **Event Creation & Storage Fallback**: Fixed event creation in local sandbox and Firestore mode with graceful try/catch local storage fallback.
+- **Footer Credit**: Updated footer credit to "Designed by @shareararko".
 - **Cloudflare Wrangler Deployment**:
   - Configured `"not_found_handling": "single-page-application"` in `wrangler.jsonc` to support single-page application route fallback.
   - Removed `public/_redirects` to resolve Cloudflare Wrangler asset validation error (infinite loop check).
