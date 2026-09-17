@@ -12,8 +12,8 @@ const firebaseConfig = {
 };
 
 export const isFirebaseConfigured = Boolean(
-  import.meta.env.VITE_FIREBASE_PROJECT_ID &&
-  import.meta.env.VITE_FIREBASE_PROJECT_ID !== "your_project_id"
+  (firebaseConfig.projectId && firebaseConfig.projectId !== "your_project_id") ||
+  (import.meta.env.VITE_FIREBASE_PROJECT_ID && import.meta.env.VITE_FIREBASE_PROJECT_ID !== "your_project_id")
 );
 
 let app = null;
