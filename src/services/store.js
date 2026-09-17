@@ -31,6 +31,7 @@ export const STATUS_OPTIONS = [
 
 const LOCAL_STORAGE_KEY_EVENTS = 'apple_notion_events';
 const LOCAL_STORAGE_KEY_EXPENSES = 'apple_notion_expenses';
+const LOCAL_STORAGE_KEY_CATEGORIES = 'apple_notion_categories';
 
 // Sample default data for local mode demo
 const DEFAULT_EVENTS = [
@@ -128,22 +129,118 @@ const DEFAULT_EXPENSES = [
 ];
 
 // Helper to load local storage
+const STORE_UPDATE_EVENT = 'app_store_updated';
+
+function notifyLocalChange() {
+  window.dispatchEvent(new Event('storage'));
+  window.dispatchEvent(new Event(STORE_UPDATE_EVENT));
+}
+
 function getLocalEvents() {
-  const data = localStorage.getItem(LOCAL_STORAGE_KEY_EVENTS);
-  if (!data) {
-    localStorage.setItem(LOCAL_STORAGE_KEY_EVENTS, JSON.stringify(DEFAULT_EVENTS));
+  try {
+    const data = localStorage.getItem(LOCAL_STORAGE_KEY_EVENTS);
+    if (!data) {
+      localStorage.setItem(LOCAL_STORAGE_KEY_EVENTS, JSON.stringify(DEFAULT_EVENTS));
+      return DEFAULT_EVENTS;
+    }
+    return JSON.parse(data);
+  } catch (err) {
+    console.error("Failed to read local events:", err);
     return DEFAULT_EVENTS;
   }
-  return JSON.parse(data);
 }
 
 function getLocalExpenses() {
-  const data = localStorage.getItem(LOCAL_STORAGE_KEY_EXPENSES);
-  if (!data) {
-    localStorage.setItem(LOCAL_STORAGE_KEY_EXPENSES, JSON.stringify(DEFAULT_EXPENSES));
+  try {
+    const data = localStorage.getItem(LOCAL_STORAGE_KEY_EXPENSES);
+    if (!data) {
+      localStorage.setItem(LOCAL_STORAGE_KEY_EXPENSES, JSON.stringify(DEFAULT_EXPENSES));
+      return DEFAULT_EXPENSES;
+    }
+    return JSON.parse(data);
+  } catch (err) {
+    console.error("Failed to read local expenses:", err);
     return DEFAULT_EXPENSES;
   }
-  return JSON.parse(data);
+}
+
+function getLocalCategories() {
+  try {
+    const data = localStorage.getItem(LOCAL_STORAGE_KEY_CATEGORIES);
+    if (!data) {
+      localStorage.setItem(LOCAL_STORAGE_KEY_CATEGORIES, JSON.stringify(DEFAULT_CATEGORIES));
+      return DEFAULT_CATEGORIES;
+    }
+    return JSON.parse(data);
+  } catch (err) {
+    console.error("Failed to read local categories:", err);
+    return DEFAULT_CATEGORIES;
+  }
+}
+
+/** Subscribe to Categories */
+export function subscribeToCategories(callback) {
+  if (isFirebaseConfigured && db) {
+    const catRef = collection(db, "categories");
+    return onSnapshot(catRef, (snapshot) => {
+      const cats = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      if (cats.length === 0) {
+        callback(DEFAULT_CATEGORIES);
+      } else {
+        callback(cats);
+      }
+    }, (err) => {
+      console.error("Firestore categories error:", err);
+      callback(getLocalCategories());
+    });
+  } else {
+    callback(getLocalCategories());
+    const handleStorage = () => callback(getLocalCategories());
+    window.addEventListener('storage', handleStorage);
+    window.addEventListener(STORE_UPDATE_EVENT, handleStorage);
+    return () => {
+      window.removeEventListener('storage', handleStorage);
+      window.removeEventListener(STORE_UPDATE_EVENT, handleStorage);
+    };
+  }
+}
+
+/** Add new Category */
+export async function addCategory(categoryData) {
+  const label = categoryData.label.trim();
+  if (!label) return null;
+
+  if (isFirebaseConfigured && db) {
+    try {
+      const catRef = collection(db, "categories");
+      const docRef = await addDoc(catRef, {
+        label,
+        color: categoryData.color || 'blue',
+        createdAt: serverTimestamp()
+      });
+      return { id: docRef.id, label, color: categoryData.color || 'blue' };
+    } catch (err) {
+      console.warn("Firestore addCategory failed, falling back to local storage:", err);
+    }
+  }
+
+  const categories = getLocalCategories();
+  const existing = categories.find(c => c.label.toLowerCase() === label.toLowerCase());
+  if (existing) return existing;
+
+  const newCat = {
+    id: 'cat-' + Date.now(),
+    label,
+    color: categoryData.color || 'blue',
+    createdAt: new Date().toISOString()
+  };
+  categories.push(newCat);
+  localStorage.setItem(LOCAL_STORAGE_KEY_CATEGORIES, JSON.stringify(categories));
+  notifyLocalChange();
+  return newCat;
 }
 
 /** Subscribe to Events */
@@ -164,7 +261,11 @@ export function subscribeToEvents(callback) {
     callback(getLocalEvents());
     const handleStorage = () => callback(getLocalEvents());
     window.addEventListener('storage', handleStorage);
-    return () => window.removeEventListener('storage', handleStorage);
+    window.addEventListener(STORE_UPDATE_EVENT, handleStorage);
+    return () => {
+      window.removeEventListener('storage', handleStorage);
+      window.removeEventListener(STORE_UPDATE_EVENT, handleStorage);
+    };
   }
 }
 
@@ -196,105 +297,137 @@ export function subscribeToExpenses(eventId, callback) {
     filterAndSend();
     const handleStorage = () => filterAndSend();
     window.addEventListener('storage', handleStorage);
-    return () => window.removeEventListener('storage', handleStorage);
+    window.addEventListener(STORE_UPDATE_EVENT, handleStorage);
+    return () => {
+      window.removeEventListener('storage', handleStorage);
+      window.removeEventListener(STORE_UPDATE_EVENT, handleStorage);
+    };
   }
 }
 
 /** Add new Event */
 export async function addEvent(eventData) {
   if (isFirebaseConfigured && db) {
-    const eventsRef = collection(db, "events");
-    const docRef = await addDoc(eventsRef, {
-      ...eventData,
-      createdAt: serverTimestamp()
-    });
-    return docRef.id;
-  } else {
-    const events = getLocalEvents();
-    const newEvent = {
-      id: 'event-' + Date.now(),
-      ...eventData,
-      createdAt: new Date().toISOString()
-    };
-    events.push(newEvent);
-    localStorage.setItem(LOCAL_STORAGE_KEY_EVENTS, JSON.stringify(events));
-    window.dispatchEvent(new Event('storage'));
-    return newEvent.id;
+    try {
+      const eventsRef = collection(db, "events");
+      const docRef = await addDoc(eventsRef, {
+        ...eventData,
+        createdAt: serverTimestamp()
+      });
+      return docRef.id;
+    } catch (err) {
+      console.warn("Firestore addEvent failed, falling back to local storage:", err);
+    }
   }
+
+  const events = getLocalEvents();
+  const newEvent = {
+    id: 'event-' + Date.now(),
+    ...eventData,
+    createdAt: new Date().toISOString()
+  };
+  events.push(newEvent);
+  localStorage.setItem(LOCAL_STORAGE_KEY_EVENTS, JSON.stringify(events));
+  notifyLocalChange();
+  return newEvent.id;
 }
 
 /** Update Event */
 export async function updateEvent(eventId, updateData) {
   if (isFirebaseConfigured && db) {
-    const eventRef = doc(db, "events", eventId);
-    await updateDoc(eventRef, updateData);
-  } else {
-    const events = getLocalEvents().map(e => e.id === eventId ? { ...e, ...updateData } : e);
-    localStorage.setItem(LOCAL_STORAGE_KEY_EVENTS, JSON.stringify(events));
-    window.dispatchEvent(new Event('storage'));
+    try {
+      const eventRef = doc(db, "events", eventId);
+      await updateDoc(eventRef, updateData);
+      return;
+    } catch (err) {
+      console.warn("Firestore updateEvent failed, falling back to local storage:", err);
+    }
   }
+
+  const events = getLocalEvents().map(e => e.id === eventId ? { ...e, ...updateData } : e);
+  localStorage.setItem(LOCAL_STORAGE_KEY_EVENTS, JSON.stringify(events));
+  notifyLocalChange();
 }
 
 /** Delete Event */
 export async function deleteEvent(eventId) {
   if (isFirebaseConfigured && db) {
-    const eventRef = doc(db, "events", eventId);
-    await deleteDoc(eventRef);
-  } else {
-    const events = getLocalEvents().filter(e => e.id !== eventId);
-    const expenses = getLocalExpenses().filter(e => e.eventId !== eventId);
-    localStorage.setItem(LOCAL_STORAGE_KEY_EVENTS, JSON.stringify(events));
-    localStorage.setItem(LOCAL_STORAGE_KEY_EXPENSES, JSON.stringify(expenses));
-    window.dispatchEvent(new Event('storage'));
+    try {
+      const eventRef = doc(db, "events", eventId);
+      await deleteDoc(eventRef);
+      return;
+    } catch (err) {
+      console.warn("Firestore deleteEvent failed, falling back to local storage:", err);
+    }
   }
+
+  const events = getLocalEvents().filter(e => e.id !== eventId);
+  const expenses = getLocalExpenses().filter(e => e.eventId !== eventId);
+  localStorage.setItem(LOCAL_STORAGE_KEY_EVENTS, JSON.stringify(events));
+  localStorage.setItem(LOCAL_STORAGE_KEY_EXPENSES, JSON.stringify(expenses));
+  notifyLocalChange();
 }
 
 /** Add Expense */
 export async function addExpense(eventId, expenseData) {
   if (isFirebaseConfigured && db) {
-    const expensesRef = collection(db, "events", eventId, "expenses");
-    const docRef = await addDoc(expensesRef, {
-      ...expenseData,
-      createdAt: serverTimestamp()
-    });
-    return docRef.id;
-  } else {
-    const expenses = getLocalExpenses();
-    const newExpense = {
-      id: 'exp-' + Date.now(),
-      eventId,
-      ...expenseData,
-      createdAt: new Date().toISOString()
-    };
-    expenses.push(newExpense);
-    localStorage.setItem(LOCAL_STORAGE_KEY_EXPENSES, JSON.stringify(expenses));
-    window.dispatchEvent(new Event('storage'));
-    return newExpense.id;
+    try {
+      const expensesRef = collection(db, "events", eventId, "expenses");
+      const docRef = await addDoc(expensesRef, {
+        ...expenseData,
+        createdAt: serverTimestamp()
+      });
+      return docRef.id;
+    } catch (err) {
+      console.warn("Firestore addExpense failed, falling back to local storage:", err);
+    }
   }
+
+  const expenses = getLocalExpenses();
+  const newExpense = {
+    id: 'exp-' + Date.now(),
+    eventId,
+    ...expenseData,
+    createdAt: new Date().toISOString()
+  };
+  expenses.push(newExpense);
+  localStorage.setItem(LOCAL_STORAGE_KEY_EXPENSES, JSON.stringify(expenses));
+  notifyLocalChange();
+  return newExpense.id;
 }
 
 /** Update Expense */
 export async function updateExpense(eventId, expenseId, updateData) {
   if (isFirebaseConfigured && db) {
-    const expenseRef = doc(db, "events", eventId, "expenses", expenseId);
-    await updateDoc(expenseRef, updateData);
-  } else {
-    const expenses = getLocalExpenses().map(exp =>
-      exp.id === expenseId ? { ...exp, ...updateData } : exp
-    );
-    localStorage.setItem(LOCAL_STORAGE_KEY_EXPENSES, JSON.stringify(expenses));
-    window.dispatchEvent(new Event('storage'));
+    try {
+      const expenseRef = doc(db, "events", eventId, "expenses", expenseId);
+      await updateDoc(expenseRef, updateData);
+      return;
+    } catch (err) {
+      console.warn("Firestore updateExpense failed, falling back to local storage:", err);
+    }
   }
+
+  const expenses = getLocalExpenses().map(exp =>
+    exp.id === expenseId ? { ...exp, ...updateData } : exp
+  );
+  localStorage.setItem(LOCAL_STORAGE_KEY_EXPENSES, JSON.stringify(expenses));
+  notifyLocalChange();
 }
 
 /** Delete Expense */
 export async function deleteExpense(eventId, expenseId) {
   if (isFirebaseConfigured && db) {
-    const expenseRef = doc(db, "events", eventId, "expenses", expenseId);
-    await deleteDoc(expenseRef);
-  } else {
-    const expenses = getLocalExpenses().filter(exp => exp.id !== expenseId);
-    localStorage.setItem(LOCAL_STORAGE_KEY_EXPENSES, JSON.stringify(expenses));
-    window.dispatchEvent(new Event('storage'));
+    try {
+      const expenseRef = doc(db, "events", eventId, "expenses", expenseId);
+      await deleteDoc(expenseRef);
+      return;
+    } catch (err) {
+      console.warn("Firestore deleteExpense failed, falling back to local storage:", err);
+    }
   }
+
+  const expenses = getLocalExpenses().filter(exp => exp.id !== expenseId);
+  localStorage.setItem(LOCAL_STORAGE_KEY_EXPENSES, JSON.stringify(expenses));
+  notifyLocalChange();
 }

@@ -157,7 +157,7 @@ export default function App() {
 
       {/* Footer */}
       <footer className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 border-t border-[#E3E2E0] dark:border-[#2F2F2F] text-center text-xs text-gray-400 space-y-1">
-        <p>Designed with Apple x Notion visual aesthetics. Powered by Firebase & Cloudflare Pages.</p>
+        <p>Designed by @shareararko. Powered by Firebase & Cloudflare Pages.</p>
       </footer>
     </div>
   );
