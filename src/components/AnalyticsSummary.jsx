@@ -1,37 +1,56 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Wallet, PieChart, CheckCircle2, Clock, AlertCircle } from 'lucide-react';
 import { formatCurrency, CategoryBadge } from './Badges';
 
-export function AnalyticsSummary({ currentEvent, expenses }) {
+// Wrapped with React.memo to avoid re-calculating or re-rendering when parent state (e.g., dark mode toggle) changes
+export const AnalyticsSummary = React.memo(function AnalyticsSummary({ currentEvent, expenses }) {
   if (!currentEvent) return null;
 
   const currency = currentEvent.currency || 'USD';
   const totalBudget = parseFloat(currentEvent.budget) || 0;
 
-  const totalSpent = expenses.reduce((acc, exp) => acc + (parseFloat(exp.amount) || 0), 0);
+  // Single-pass computation of totalSpent, paidTotal, pendingTotal, and category breakdown.
+  // Reduces array iterations from 4N to 1N and eliminates temporary array allocations.
+  const { totalSpent, paidTotal, pendingTotal, categorySorted } = useMemo(() => {
+    let spentSum = 0;
+    let paidSum = 0;
+    let pendingSum = 0;
+    const catMap = {};
+
+    for (let i = 0; i < expenses.length; i++) {
+      const exp = expenses[i];
+      const amount = parseFloat(exp.amount) || 0;
+      spentSum += amount;
+
+      if (exp.status === 'Paid') {
+        paidSum += amount;
+      } else if (exp.status === 'Pending') {
+        pendingSum += amount;
+      }
+
+      const cat = exp.category || 'Miscellaneous';
+      catMap[cat] = (catMap[cat] || 0) + amount;
+    }
+
+    const sortedCats = Object.entries(catMap)
+      .map(([cat, amount]) => ({
+        cat,
+        amount,
+        pct: spentSum > 0 ? (amount / spentSum) * 100 : 0,
+      }))
+      .sort((a, b) => b.amount - a.amount);
+
+    return {
+      totalSpent: spentSum,
+      paidTotal: paidSum,
+      pendingTotal: pendingSum,
+      categorySorted: sortedCats,
+    };
+  }, [expenses]);
+
   const remaining = totalBudget - totalSpent;
   const spentPercent = totalBudget > 0 ? Math.min(Math.round((totalSpent / totalBudget) * 100), 100) : 0;
   const isOverBudget = remaining < 0;
-
-  // Breakdown by status
-  const paidTotal = expenses
-    .filter(e => e.status === 'Paid')
-    .reduce((acc, exp) => acc + (parseFloat(exp.amount) || 0), 0);
-
-  const pendingTotal = expenses
-    .filter(e => e.status === 'Pending')
-    .reduce((acc, exp) => acc + (parseFloat(exp.amount) || 0), 0);
-
-  // Category breakdown
-  const categoryMap = {};
-  expenses.forEach(exp => {
-    const cat = exp.category || 'Miscellaneous';
-    categoryMap[cat] = (categoryMap[cat] || 0) + (parseFloat(exp.amount) || 0);
-  });
-
-  const categorySorted = Object.entries(categoryMap)
-    .map(([cat, amount]) => ({ cat, amount, pct: totalSpent > 0 ? (amount / totalSpent) * 100 : 0 }))
-    .sort((a, b) => b.amount - a.amount);
 
   return (
     <div className="space-y-6">
@@ -159,4 +178,4 @@ export function AnalyticsSummary({ currentEvent, expenses }) {
       )}
     </div>
   );
-}
+});

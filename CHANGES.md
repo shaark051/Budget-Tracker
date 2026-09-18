@@ -6,6 +6,11 @@ All notable changes and architectural overview for the **Apple x Notion Event Bu
 
 ## [Unreleased]
 
+### Performance
+- **Analytics calculations & Badge memoization**:
+  - Optimized `AnalyticsSummary` calculations into a single-pass `useMemo` loop, reducing iteration complexity from $O(4N)$ to $O(N)$ and eliminating temporary intermediate array allocations.
+  - Wrapped `AnalyticsSummary`, `CategoryBadge`, and `StatusBadge` in `React.memo` to prevent unnecessary component re-renders when unrelated parent state updates.
+
 ### Fixed
 - **Cloudflare Wrangler Deployment**:
   - Configured `"not_found_handling": "single-page-application"` in `wrangler.jsonc` to support single-page application route fallback.
