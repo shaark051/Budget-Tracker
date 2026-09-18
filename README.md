@@ -1,4 +1,4 @@
-# Event Budget & Expenditure Tracker (Apple x Notion Design)
+# Event Budget & Expenditure Tracker (@shaarky Design)
 
 An elegant, intuitive budget and expenditure web application inspired by the design philosophies of Apple and Notion.
 
@@ -6,7 +6,7 @@ An elegant, intuitive budget and expenditure web application inspired by the des
 
 ## Features
 
-- **Apple x Notion Aesthetics**: Clean layout, glassmorphic header, sleek typography, Notion-styled colored badges, and seamless Light/Dark mode.
+- **@shaarky Aesthetics**: Clean layout, glassmorphic header, sleek typography, Notion-styled colored badges, and seamless Light/Dark mode.
 - **Multi-Event Workspaces**: Easily manage multiple event budgets simultaneously.
 - **Real-Time Analytics**: Monitor total budget vs. spent, remaining balance, status counts, and category breakdown progress.
 - **Rich Expense Table**:

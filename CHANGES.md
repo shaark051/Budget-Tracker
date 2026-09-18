@@ -1,6 +1,6 @@
 # Changelog & System Overview
 
-All notable changes and architectural overview for the **Apple x Notion Event Budget & Expenditure Tracker**.
+All notable changes and architectural overview for the **@shaarky Event Budget & Expenditure Tracker**.
 
 ---
 
@@ -24,7 +24,7 @@ All notable changes and architectural overview for the **Apple x Notion Event Bu
 ## [1.0.0] - 2025-04-15
 
 ### Initial Release Features
-- 🍏 **Apple x Notion Design System**:
+- 🍏 **@shaarky Design System**:
   - Translucent glassmorphism headers and cards with soft drop-shadows (`shadow-apple`).
   - Notion-inspired colored badge pills for categories and payment status tags.
   - Full Light and Dark Mode toggle with automatic system preference detection.
