@@ -229,13 +229,14 @@ export function ExpenseTable({
           <Search className="w-4 h-4 absolute left-3 top-2.5 text-gray-400" />
           <input
             type="text"
+            aria-label="Search expenses"
             placeholder="Search expense, vendor, notes..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-9 pr-3 py-2 text-xs bg-white dark:bg-[#191919] border border-[#E3E2E0] dark:border-[#2F2F2F] rounded-xl focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition-all text-[#37352F] dark:text-[#D4D4D4]"
           />
           {searchQuery && (
-            <button onClick={() => setSearchQuery('')} className="absolute right-2.5 top-2.5 text-gray-400 hover:text-gray-600">
+            <button onClick={() => setSearchQuery('')} aria-label="Clear search query" className="absolute right-2.5 top-2.5 text-gray-400 hover:text-gray-600">
               <X className="w-3.5 h-3.5" />
             </button>
           )}
@@ -244,6 +245,7 @@ export function ExpenseTable({
         {/* Category Filter */}
         <div>
           <select
+            aria-label="Filter expenses by category"
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
             className="w-full px-3 py-2 text-xs bg-white dark:bg-[#191919] border border-[#E3E2E0] dark:border-[#2F2F2F] rounded-xl focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white text-[#37352F] dark:text-[#D4D4D4]"
@@ -258,9 +260,10 @@ export function ExpenseTable({
         {/* Status Filter */}
         <div>
           <select
+            aria-label="Filter expenses by status"
             value={selectedStatus}
             onChange={(e) => setSelectedStatus(e.target.value)}
-            className="w-full px-3 py-2 text-xs bg-white dark:bg-[#191919] border border-[#E3E2E0] dark:border-[#2F2F2F] rounded-xl focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white text-[#37352F] dark:text-[#D4D4D4]"
+            className="w-full px-3 py-2 text-[#37352F] text-xs bg-white dark:bg-[#191919] border border-[#E3E2E0] dark:border-[#2F2F2F] rounded-xl focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white dark:text-[#D4D4D4]"
           >
             <option value="ALL">All Statuses</option>
             {STATUS_OPTIONS.map(st => (
@@ -339,6 +342,7 @@ export function ExpenseTable({
                     <div className="flex items-center justify-end space-x-1 opacity-80 group-hover:opacity-100 transition-opacity">
                       <button
                         onClick={() => openEditModal(exp)}
+                        aria-label={`Edit ${exp.title}`}
                         className="p-1 hover:bg-gray-200 dark:hover:bg-[#2B2B2B] rounded text-gray-600 dark:text-gray-300 transition-colors"
                         title="Edit Expense"
                       >
@@ -350,6 +354,7 @@ export function ExpenseTable({
                             onDeleteExpense(currentEvent.id, exp.id);
                           }
                         }}
+                        aria-label={`Delete ${exp.title}`}
                         className="p-1 hover:bg-red-100 dark:hover:bg-red-950/40 rounded text-red-500 transition-colors"
                         title="Delete Expense"
                       >
@@ -373,7 +378,7 @@ export function ExpenseTable({
                 <FolderPlus className="w-4 h-4" />
                 <span>Create New Category</span>
               </h3>
-              <button onClick={() => setIsCategoryModalOpen(false)} className="text-gray-400 hover:text-gray-600">
+              <button onClick={() => setIsCategoryModalOpen(false)} aria-label="Close modal" className="text-gray-400 hover:text-gray-600">
                 <X className="w-4 h-4" />
               </button>
             </div>
@@ -417,7 +422,7 @@ export function ExpenseTable({
               <h3 className="text-lg font-semibold text-[#37352F] dark:text-[#D4D4D4]">
                 {editingExpense ? 'Edit Expense Item' : 'New Expense Item'}
               </h3>
-              <button onClick={() => setIsModalOpen(false)} className="text-gray-400 hover:text-gray-600">
+              <button onClick={() => setIsModalOpen(false)} aria-label="Close modal" className="text-gray-400 hover:text-gray-600">
                 <X className="w-5 h-5" />
               </button>
             </div>

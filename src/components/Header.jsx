@@ -149,6 +149,7 @@ export function Header({
             </span>
             <button
               onClick={openEditModal}
+              aria-label="Edit event details"
               className="p-1.5 hover:bg-[#F7F6F3] dark:hover:bg-[#202020] rounded-md transition-colors"
               title="Edit Event Details"
             >
@@ -161,6 +162,7 @@ export function Header({
                     onDeleteEvent(currentEvent.id);
                   }
                 }}
+                aria-label="Delete event"
                 className="p-1.5 hover:bg-red-50 text-red-500 dark:hover:bg-red-950/40 rounded-md transition-colors"
                 title="Delete Event"
               >
@@ -198,7 +200,7 @@ export function Header({
           <div className="bg-white dark:bg-[#202020] border border-[#E3E2E0] dark:border-[#2F2F2F] rounded-2xl shadow-apple max-w-md w-full p-6 space-y-4">
             <div className="flex items-center justify-between pb-2 border-b border-[#E3E2E0] dark:border-[#2F2F2F]">
               <h3 className="text-lg font-semibold text-[#37352F] dark:text-[#D4D4D4]">Create New Event</h3>
-              <button onClick={() => setIsNewEventModalOpen(false)} className="text-gray-400 hover:text-gray-600">
+              <button onClick={() => setIsNewEventModalOpen(false)} aria-label="Close modal" className="text-gray-400 hover:text-gray-600">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -280,7 +282,7 @@ export function Header({
           <div className="bg-white dark:bg-[#202020] border border-[#E3E2E0] dark:border-[#2F2F2F] rounded-2xl shadow-apple max-w-md w-full p-6 space-y-4">
             <div className="flex items-center justify-between pb-2 border-b border-[#E3E2E0] dark:border-[#2F2F2F]">
               <h3 className="text-lg font-semibold text-[#37352F] dark:text-[#D4D4D4]">Edit Event</h3>
-              <button onClick={() => setIsEditEventModalOpen(false)} className="text-gray-400 hover:text-gray-600">
+              <button onClick={() => setIsEditEventModalOpen(false)} aria-label="Close modal" className="text-gray-400 hover:text-gray-600">
                 <X className="w-5 h-5" />
               </button>
             </div>
