@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import {
   ChevronDown,
   Plus,
@@ -193,9 +194,9 @@ export function Header({
       </div>
 
       {/* Modal: New Event */}
-      {isNewEventModalOpen && (
+      {isNewEventModalOpen && createPortal(
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-white dark:bg-[#202020] border border-[#E3E2E0] dark:border-[#2F2F2F] rounded-2xl shadow-apple max-w-md w-full p-6 space-y-4">
+          <div className="bg-white dark:bg-[#202020] border border-[#E3E2E0] dark:border-[#2F2F2F] rounded-2xl shadow-apple max-w-md w-full p-6 space-y-4 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between pb-2 border-b border-[#E3E2E0] dark:border-[#2F2F2F]">
               <h3 className="text-lg font-semibold text-[#37352F] dark:text-[#D4D4D4]">Create New Event</h3>
               <button onClick={() => setIsNewEventModalOpen(false)} className="text-gray-400 hover:text-gray-600">
@@ -271,13 +272,14 @@ export function Header({
               </div>
             </form>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* Modal: Edit Event */}
-      {isEditEventModalOpen && (
+      {isEditEventModalOpen && createPortal(
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-white dark:bg-[#202020] border border-[#E3E2E0] dark:border-[#2F2F2F] rounded-2xl shadow-apple max-w-md w-full p-6 space-y-4">
+          <div className="bg-white dark:bg-[#202020] border border-[#E3E2E0] dark:border-[#2F2F2F] rounded-2xl shadow-apple max-w-md w-full p-6 space-y-4 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between pb-2 border-b border-[#E3E2E0] dark:border-[#2F2F2F]">
               <h3 className="text-lg font-semibold text-[#37352F] dark:text-[#D4D4D4]">Edit Event</h3>
               <button onClick={() => setIsEditEventModalOpen(false)} className="text-gray-400 hover:text-gray-600">
@@ -351,7 +353,8 @@ export function Header({
               </div>
             </form>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </header>
   );

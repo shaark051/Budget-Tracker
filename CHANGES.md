@@ -7,6 +7,9 @@ All notable changes and architectural overview for the **Apple x Notion Event Bu
 ## [Unreleased]
 
 ### Fixed
+- **Modal Positioning**:
+  - Used React `createPortal` to render modal dialogs (`New Event`, `Edit Event`, `New Expense`, `New Category`) onto `document.body` to resolve top clipping and overflow issues caused by header CSS stacking contexts.
+  - Added max-height constraint (`max-h-[90vh] overflow-y-auto`) to ensure full modal visibility and scrollability on all screens.
 - **Cloudflare Wrangler Deployment**:
   - Configured `"not_found_handling": "single-page-application"` in `wrangler.jsonc` to support single-page application route fallback.
   - Removed `public/_redirects` to resolve Cloudflare Wrangler asset validation error (infinite loop check).
