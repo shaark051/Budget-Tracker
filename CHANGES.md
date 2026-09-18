@@ -6,6 +6,11 @@ All notable changes and architectural overview for the **Apple x Notion Event Bu
 
 ## [Unreleased]
 
+### Performance
+- **Analytics calculations & Badge memoization**:
+  - Optimized `AnalyticsSummary` calculations into a single-pass `useMemo` loop, reducing iteration complexity from $O(4N)$ to $O(N)$ and eliminating temporary intermediate array allocations.
+  - Wrapped `AnalyticsSummary`, `CategoryBadge`, and `StatusBadge` in `React.memo` to prevent unnecessary component re-renders when unrelated parent state updates.
+
 ### Fixed
 - **Modal Positioning**:
   - Used React `createPortal` to render modal dialogs (`New Event`, `Edit Event`, `New Expense`, `New Category`) onto `document.body` to resolve top clipping and overflow issues caused by header CSS stacking contexts.

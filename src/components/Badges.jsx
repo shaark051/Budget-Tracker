@@ -19,7 +19,7 @@ const STATUS_COLOR_MAP = {
   'Cancelled': 'bg-[#FDEBEC] text-[#B91C1C] dark:bg-[#3E1B18] dark:text-[#F87171] border-[#F8C9CB] dark:border-[#5C2B27]',
 };
 
-export function CategoryBadge({ category }) {
+export const CategoryBadge = React.memo(function CategoryBadge({ category }) {
   const colorClass = CATEGORY_COLOR_MAP[category] || CATEGORY_COLOR_MAP['Miscellaneous'];
   return (
     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${colorClass} transition-colors`}>
@@ -27,16 +27,16 @@ export function CategoryBadge({ category }) {
       {category}
     </span>
   );
-}
+});
 
-export function StatusBadge({ status }) {
+export const StatusBadge = React.memo(function StatusBadge({ status }) {
   const colorClass = STATUS_COLOR_MAP[status] || STATUS_COLOR_MAP['Pending'];
   return (
     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium border ${colorClass} transition-colors`}>
       {status}
     </span>
   );
-}
+});
 
 export function formatCurrency(amount, currency = 'USD') {
   return new Intl.NumberFormat('en-US', {
