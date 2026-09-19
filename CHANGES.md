@@ -6,6 +6,12 @@ All notable changes and architectural overview for the **@shaarky Event Budget &
 
 ## [Unreleased]
 
+### Accessibility & Micro-UX
+- **Modal Dialog Keyboard & Backdrop Navigation**:
+  - Added `Escape` key keyboard listeners to close active modals (`New Event`, `Edit Event`, `New Expense`, `New Category`) and dropdowns.
+  - Added backdrop overlay click-to-dismiss behavior for all modal dialogs.
+  - Added standard dialog ARIA attributes (`role="dialog"`, `aria-modal="true"`, `aria-labelledby`) to enhance screen reader support.
+
 ### Performance
 - **Analytics calculations & Badge memoization**:
   - Optimized `AnalyticsSummary` calculations into a single-pass `useMemo` loop, reducing iteration complexity from $O(4N)$ to $O(N)$ and eliminating temporary intermediate array allocations.
