@@ -178,6 +178,42 @@ function getLocalCategories() {
   }
 }
 
+/** Merge default categories with custom categories ensuring no duplicate labels and preserving updated colors */
+function mergeCategories(customCategories) {
+  const customMap = new Map();
+  for (const cat of customCategories) {
+    if (cat.label) {
+      customMap.set(cat.label.toLowerCase(), cat);
+    }
+  }
+
+  const merged = [];
+  const defaultLabels = new Set();
+
+  for (const defaultCat of DEFAULT_CATEGORIES) {
+    const key = defaultCat.label.toLowerCase();
+    defaultLabels.add(key);
+    if (customMap.has(key)) {
+      const customOverride = customMap.get(key);
+      merged.push({
+        ...defaultCat,
+        ...customOverride,
+        color: customOverride.color || defaultCat.color
+      });
+    } else {
+      merged.push(defaultCat);
+    }
+  }
+
+  for (const cat of customCategories) {
+    if (cat.label && !defaultLabels.has(cat.label.toLowerCase())) {
+      merged.push(cat);
+    }
+  }
+
+  return merged;
+}
+
 /** Subscribe to Categories */
 export function subscribeToCategories(callback) {
   if (isFirebaseConfigured && db) {
@@ -187,18 +223,14 @@ export function subscribeToCategories(callback) {
         id: doc.id,
         ...doc.data()
       }));
-      if (cats.length === 0) {
-        callback(DEFAULT_CATEGORIES);
-      } else {
-        callback(cats);
-      }
+      callback(mergeCategories(cats));
     }, (err) => {
       console.error("Firestore categories error:", err);
-      callback(getLocalCategories());
+      callback(mergeCategories(getLocalCategories()));
     });
   } else {
-    callback(getLocalCategories());
-    const handleStorage = () => callback(getLocalCategories());
+    callback(mergeCategories(getLocalCategories()));
+    const handleStorage = () => callback(mergeCategories(getLocalCategories()));
     window.addEventListener('storage', handleStorage);
     window.addEventListener(STORE_UPDATE_EVENT, handleStorage);
     return () => {
@@ -228,8 +260,16 @@ export async function addCategory(categoryData) {
   }
 
   const categories = getLocalCategories();
-  const existing = categories.find(c => c.label.toLowerCase() === label.toLowerCase());
-  if (existing) return existing;
+  const existingIndex = categories.findIndex(c => c.label.toLowerCase() === label.toLowerCase());
+  if (existingIndex >= 0) {
+    categories[existingIndex] = {
+      ...categories[existingIndex],
+      color: categoryData.color || categories[existingIndex].color || 'blue'
+    };
+    localStorage.setItem(LOCAL_STORAGE_KEY_CATEGORIES, JSON.stringify(categories));
+    notifyLocalChange();
+    return categories[existingIndex];
+  }
 
   const newCat = {
     id: 'cat-' + Date.now(),
@@ -241,6 +281,54 @@ export async function addCategory(categoryData) {
   localStorage.setItem(LOCAL_STORAGE_KEY_CATEGORIES, JSON.stringify(categories));
   notifyLocalChange();
   return newCat;
+}
+
+/** Update Category Color */
+export async function updateCategory(catIdOrLabel, updateData) {
+  if (isFirebaseConfigured && db) {
+    try {
+      const categories = getLocalCategories(); // or query from firestore
+      const catRef = collection(db, "categories");
+      // Check if catIdOrLabel is an existing document ID or label
+      if (catIdOrLabel.startsWith('cat-') || catIdOrLabel.length > 15) {
+        const docRef = doc(db, "categories", catIdOrLabel);
+        await updateDoc(docRef, updateData);
+        return;
+      } else {
+        // Query / set doc for label
+        const docRef = await addDoc(catRef, {
+          label: catIdOrLabel,
+          ...updateData,
+          createdAt: serverTimestamp()
+        });
+        return docRef.id;
+      }
+    } catch (err) {
+      console.warn("Firestore updateCategory failed, falling back to local storage:", err);
+    }
+  }
+
+  const categories = getLocalCategories();
+  const existingIndex = categories.findIndex(
+    c => (c.id && c.id === catIdOrLabel) || (c.label && c.label.toLowerCase() === catIdOrLabel.toLowerCase())
+  );
+
+  if (existingIndex >= 0) {
+    categories[existingIndex] = {
+      ...categories[existingIndex],
+      ...updateData
+    };
+  } else {
+    categories.push({
+      id: 'cat-' + Date.now(),
+      label: catIdOrLabel,
+      ...updateData,
+      createdAt: new Date().toISOString()
+    });
+  }
+
+  localStorage.setItem(LOCAL_STORAGE_KEY_CATEGORIES, JSON.stringify(categories));
+  notifyLocalChange();
 }
 
 /** Subscribe to Events */

@@ -17,7 +17,7 @@ import {
   Tag
 } from 'lucide-react';
 import { CategoryBadge, StatusBadge, formatCurrency } from './Badges';
-import { DEFAULT_CATEGORIES, STATUS_OPTIONS, subscribeToCategories, addCategory } from '../services/store';
+import { DEFAULT_CATEGORIES, STATUS_OPTIONS, subscribeToCategories, addCategory, updateCategory } from '../services/store';
 
 // Memoized component prevents re-rendering table grid on parent state changes (e.g., dark mode toggle)
 export const ExpenseTable = React.memo(function ExpenseTable({
@@ -33,6 +33,18 @@ export const ExpenseTable = React.memo(function ExpenseTable({
   const [categories, setCategories] = useState(DEFAULT_CATEGORIES);
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
   const [newCategoryLabel, setNewCategoryLabel] = useState('');
+  const [newCategoryColor, setNewCategoryColor] = useState('blue');
+
+  const COLOR_OPTIONS = [
+    { id: 'blue', label: 'Blue', class: 'bg-[#1D4ED8]' },
+    { id: 'green', label: 'Green', class: 'bg-[#15803D]' },
+    { id: 'pink', label: 'Pink', class: 'bg-[#BE185D]' },
+    { id: 'purple', label: 'Purple', class: 'bg-[#6B21A8]' },
+    { id: 'orange', label: 'Orange', class: 'bg-[#C2410C]' },
+    { id: 'yellow', label: 'Yellow', class: 'bg-[#854D0E]' },
+    { id: 'brown', label: 'Brown', class: 'bg-[#78350F]' },
+    { id: 'gray', label: 'Gray', class: 'bg-[#5A5A5A]' },
+  ];
 
   useEffect(() => {
     const unsubscribe = subscribeToCategories((fetchedCats) => {
@@ -77,11 +89,12 @@ export const ExpenseTable = React.memo(function ExpenseTable({
   const handleCreateCategory = async (e) => {
     e.preventDefault();
     if (!newCategoryLabel.trim()) return;
-    const added = await addCategory({ label: newCategoryLabel.trim() });
+    const added = await addCategory({ label: newCategoryLabel.trim(), color: newCategoryColor });
     if (added) {
       setCategory(added.label);
     }
     setNewCategoryLabel('');
+    setNewCategoryColor('blue');
     setIsCategoryModalOpen(false);
   };
 
@@ -391,7 +404,7 @@ export const ExpenseTable = React.memo(function ExpenseTable({
         </table>
       </div>
 
-      {/* Modal: Create New Category */}
+      {/* Modal: Category Settings & Creation */}
       {isCategoryModalOpen && createPortal(
         <div
           role="dialog"
@@ -400,44 +413,84 @@ export const ExpenseTable = React.memo(function ExpenseTable({
           onClick={(e) => { if (e.target === e.currentTarget) setIsCategoryModalOpen(false); }}
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-in fade-in duration-200"
         >
-          <div className="bg-white dark:bg-[#202020] border border-[#E3E2E0] dark:border-[#2F2F2F] rounded-2xl shadow-apple max-w-sm w-full p-5 space-y-4 max-h-[90vh] overflow-y-auto">
+          <div className="bg-white dark:bg-[#202020] border border-[#E3E2E0] dark:border-[#2F2F2F] rounded-2xl shadow-apple max-w-md w-full p-5 space-y-5 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between pb-2 border-b border-[#E3E2E0] dark:border-[#2F2F2F]">
               <h3 id="new-category-title" className="text-md font-semibold text-[#37352F] dark:text-[#D4D4D4] flex items-center space-x-2">
                 <FolderPlus className="w-4 h-4" />
-                <span>Create New Category</span>
+                <span>Manage Categories</span>
               </h3>
               <button onClick={() => setIsCategoryModalOpen(false)} aria-label="Close modal" className="text-gray-400 hover:text-gray-600">
                 <X className="w-4 h-4" />
               </button>
             </div>
-            <form onSubmit={handleCreateCategory} className="space-y-3">
+
+            {/* Create New Category Form */}
+            <form onSubmit={handleCreateCategory} className="space-y-3 bg-[#F7F6F3] dark:bg-[#191919] p-3.5 rounded-xl border border-[#E3E2E0] dark:border-[#2F2F2F]">
+              <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Add New Category</h4>
               <div>
-                <label className="block text-xs font-medium text-gray-500 mb-1">Category Name</label>
                 <input
                   type="text"
                   required
                   placeholder="e.g. Security & Staffing"
                   value={newCategoryLabel}
                   onChange={(e) => setNewCategoryLabel(e.target.value)}
-                  className="w-full px-3 py-2 bg-[#F7F6F3] dark:bg-[#191919] border border-[#E3E2E0] dark:border-[#2F2F2F] rounded-lg focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white text-sm"
+                  className="w-full px-3 py-2 bg-white dark:bg-[#202020] border border-[#E3E2E0] dark:border-[#2F2F2F] rounded-lg focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white text-sm"
                 />
               </div>
-              <div className="flex justify-end space-x-2 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setIsCategoryModalOpen(false)}
-                  className="px-3 py-1.5 rounded-lg text-xs border border-[#E3E2E0] dark:border-[#2F2F2F] hover:bg-[#F7F6F3] dark:hover:bg-[#2B2B2B]"
-                >
-                  Cancel
-                </button>
+              <div>
+                <label className="block text-xs font-medium text-gray-500 mb-1.5">Tag Color</label>
+                <div className="flex items-center gap-2 flex-wrap">
+                  {COLOR_OPTIONS.map((c) => (
+                    <button
+                      key={c.id}
+                      type="button"
+                      title={c.label}
+                      onClick={() => setNewCategoryColor(c.id)}
+                      className={`w-6 h-6 rounded-full ${c.class} transition-transform flex items-center justify-center ${
+                        newCategoryColor === c.id ? 'ring-2 ring-offset-2 ring-black dark:ring-white scale-110' : 'hover:scale-105'
+                      }`}
+                    />
+                  ))}
+                </div>
+              </div>
+              <div className="flex justify-end pt-1">
                 <button
                   type="submit"
                   className="px-3 py-1.5 rounded-lg text-xs bg-black text-white dark:bg-white dark:text-black font-medium hover:opacity-90 shadow-sm"
                 >
-                  Save Category
+                  Create Category
                 </button>
               </div>
             </form>
+
+            {/* Existing Categories Color Editor */}
+            <div className="space-y-2">
+              <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Existing Categories</h4>
+              <div className="space-y-2 max-h-60 overflow-y-auto pr-1">
+                {categories.map((cat) => (
+                  <div
+                    key={cat.id || cat.label}
+                    className="flex items-center justify-between bg-white dark:bg-[#191919] border border-[#E3E2E0] dark:border-[#2F2F2F] p-2.5 rounded-xl text-xs"
+                  >
+                    <CategoryBadge category={cat} />
+                    <div className="flex items-center gap-1.5">
+                      {COLOR_OPTIONS.map((c) => (
+                        <button
+                          key={c.id}
+                          type="button"
+                          title={`Change ${cat.label} to ${c.label}`}
+                          onClick={() => updateCategory(cat.id || cat.label, { color: c.id })}
+                          className={`w-4 h-4 rounded-full ${c.class} transition-transform ${
+                            (cat.color || 'blue') === c.id ? 'ring-2 ring-offset-1 ring-black dark:ring-white scale-110' : 'opacity-70 hover:opacity-100 hover:scale-105'
+                          }`}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
           </div>
         </div>,
         document.body
