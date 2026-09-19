@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { subscribeToCategories } from '../services/store';
 
 // Notion color mappings
 export const CATEGORY_COLOR_MAP = {
@@ -48,10 +49,35 @@ function hashStringToIndex(str, max) {
 }
 
 export const CategoryBadge = React.memo(function CategoryBadge({ category, color }) {
-  const categoryLabel = typeof category === 'object' ? category.label : category;
-  const categoryColor = typeof category === 'object' ? category.color : color;
+  const [categoryColorMap, setCategoryColorMap] = useState({});
 
-  let colorClass = (categoryColor && CATEGORY_COLOR_MAP[categoryColor]) || CATEGORY_COLOR_MAP[categoryLabel];
+  useEffect(() => {
+    const unsubscribe = subscribeToCategories((cats) => {
+      const map = {};
+      for (const c of cats) {
+        if (c.label && c.color) {
+          map[c.label.toLowerCase()] = c.color;
+        }
+      }
+      setCategoryColorMap(map);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  const categoryLabel = typeof category === 'object' ? category.label : category;
+  const explicitColor = typeof category === 'object' ? category.color : color;
+
+  const dynamicColor = explicitColor || categoryColorMap[categoryLabel?.toLowerCase()];
+
+  let colorClass = dynamicColor && CATEGORY_COLOR_MAP[dynamicColor];
+
+  if (!colorClass && categoryColorMap[categoryLabel?.toLowerCase()]) {
+    colorClass = CATEGORY_COLOR_MAP[categoryColorMap[categoryLabel?.toLowerCase()]];
+  }
+
+  if (!colorClass) {
+    colorClass = CATEGORY_COLOR_MAP[categoryLabel];
+  }
 
   if (!colorClass) {
     const idx = hashStringToIndex(categoryLabel || 'default', VIBRANT_COLOR_CLASSES.length);
