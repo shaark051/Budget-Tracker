@@ -6,6 +6,12 @@ All notable changes and architectural overview for the **@shaarky Event Budget &
 
 ## [Unreleased]
 
+### Accessibility & Micro-UX
+- **Modal Dialog Keyboard & Backdrop Navigation**:
+  - Added `Escape` key keyboard listeners to close active modals (`New Event`, `Edit Event`, `New Expense`, `New Category`) and dropdowns.
+  - Added backdrop overlay click-to-dismiss behavior for all modal dialogs.
+  - Added standard dialog ARIA attributes (`role="dialog"`, `aria-modal="true"`, `aria-labelledby`) to enhance screen reader support.
+
 ### Performance
 - **ExpenseTable memoization & search query optimization**:
   - Wrapped `ExpenseTable` in `React.memo` to skip redundant re-renders when parent components update state that does not affect table props (e.g. dark mode toggling).
