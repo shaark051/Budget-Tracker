@@ -19,7 +19,8 @@ import {
 import { CategoryBadge, StatusBadge, formatCurrency } from './Badges';
 import { DEFAULT_CATEGORIES, STATUS_OPTIONS, subscribeToCategories, addCategory } from '../services/store';
 
-export function ExpenseTable({
+// Memoized component prevents re-rendering table grid on parent state changes (e.g., dark mode toggle)
+export const ExpenseTable = React.memo(function ExpenseTable({
   currentEvent,
   expenses,
   onAddExpense,
@@ -118,19 +119,26 @@ export function ExpenseTable({
     setIsModalOpen(false);
   };
 
-  // Sort & Filter logic
+  // Sort & Filter logic with optimized single query normalization and short-circuit evaluation
   const filteredAndSortedExpenses = useMemo(() => {
+    const query = searchQuery.trim().toLowerCase();
+
     return expenses
       .filter((exp) => {
-        const matchesSearch =
-          exp.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          (exp.vendor && exp.vendor.toLowerCase().includes(searchQuery.toLowerCase())) ||
-          (exp.notes && exp.notes.toLowerCase().includes(searchQuery.toLowerCase()));
-
         const matchesCat = selectedCategory === 'ALL' || exp.category === selectedCategory;
-        const matchesStatus = selectedStatus === 'ALL' || exp.status === selectedStatus;
+        if (!matchesCat) return false;
 
-        return matchesSearch && matchesCat && matchesStatus;
+        const matchesStatus = selectedStatus === 'ALL' || exp.status === selectedStatus;
+        if (!matchesStatus) return false;
+
+        if (!query) return true;
+
+        const matchesSearch =
+          (exp.title && exp.title.toLowerCase().includes(query)) ||
+          (exp.vendor && exp.vendor.toLowerCase().includes(query)) ||
+          (exp.notes && exp.notes.toLowerCase().includes(query));
+
+        return matchesSearch;
       })
       .sort((a, b) => {
         let valA = a[sortField];
@@ -549,4 +557,4 @@ export function ExpenseTable({
 
     </div>
   );
-}
+});
