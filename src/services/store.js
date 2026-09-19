@@ -178,6 +178,19 @@ function getLocalCategories() {
   }
 }
 
+/** Merge default categories with custom categories ensuring no duplicate labels */
+function mergeCategories(customCategories) {
+  const merged = [...DEFAULT_CATEGORIES];
+  const defaultLabels = new Set(DEFAULT_CATEGORIES.map(c => c.label.toLowerCase()));
+
+  for (const cat of customCategories) {
+    if (cat.label && !defaultLabels.has(cat.label.toLowerCase())) {
+      merged.push(cat);
+    }
+  }
+  return merged;
+}
+
 /** Subscribe to Categories */
 export function subscribeToCategories(callback) {
   if (isFirebaseConfigured && db) {
@@ -187,18 +200,14 @@ export function subscribeToCategories(callback) {
         id: doc.id,
         ...doc.data()
       }));
-      if (cats.length === 0) {
-        callback(DEFAULT_CATEGORIES);
-      } else {
-        callback(cats);
-      }
+      callback(mergeCategories(cats));
     }, (err) => {
       console.error("Firestore categories error:", err);
-      callback(getLocalCategories());
+      callback(mergeCategories(getLocalCategories()));
     });
   } else {
-    callback(getLocalCategories());
-    const handleStorage = () => callback(getLocalCategories());
+    callback(mergeCategories(getLocalCategories()));
+    const handleStorage = () => callback(mergeCategories(getLocalCategories()));
     window.addEventListener('storage', handleStorage);
     window.addEventListener(STORE_UPDATE_EVENT, handleStorage);
     return () => {

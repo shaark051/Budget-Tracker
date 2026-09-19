@@ -33,6 +33,18 @@ export const ExpenseTable = React.memo(function ExpenseTable({
   const [categories, setCategories] = useState(DEFAULT_CATEGORIES);
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
   const [newCategoryLabel, setNewCategoryLabel] = useState('');
+  const [newCategoryColor, setNewCategoryColor] = useState('blue');
+
+  const COLOR_OPTIONS = [
+    { id: 'blue', label: 'Blue', class: 'bg-[#1D4ED8]' },
+    { id: 'green', label: 'Green', class: 'bg-[#15803D]' },
+    { id: 'pink', label: 'Pink', class: 'bg-[#BE185D]' },
+    { id: 'purple', label: 'Purple', class: 'bg-[#6B21A8]' },
+    { id: 'orange', label: 'Orange', class: 'bg-[#C2410C]' },
+    { id: 'yellow', label: 'Yellow', class: 'bg-[#854D0E]' },
+    { id: 'brown', label: 'Brown', class: 'bg-[#78350F]' },
+    { id: 'gray', label: 'Gray', class: 'bg-[#5A5A5A]' },
+  ];
 
   useEffect(() => {
     const unsubscribe = subscribeToCategories((fetchedCats) => {
@@ -77,11 +89,12 @@ export const ExpenseTable = React.memo(function ExpenseTable({
   const handleCreateCategory = async (e) => {
     e.preventDefault();
     if (!newCategoryLabel.trim()) return;
-    const added = await addCategory({ label: newCategoryLabel.trim() });
+    const added = await addCategory({ label: newCategoryLabel.trim(), color: newCategoryColor });
     if (added) {
       setCategory(added.label);
     }
     setNewCategoryLabel('');
+    setNewCategoryColor('blue');
     setIsCategoryModalOpen(false);
   };
 
@@ -421,6 +434,22 @@ export const ExpenseTable = React.memo(function ExpenseTable({
                   onChange={(e) => setNewCategoryLabel(e.target.value)}
                   className="w-full px-3 py-2 bg-[#F7F6F3] dark:bg-[#191919] border border-[#E3E2E0] dark:border-[#2F2F2F] rounded-lg focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white text-sm"
                 />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-500 mb-1.5">Tag Color</label>
+                <div className="flex items-center gap-2 flex-wrap">
+                  {COLOR_OPTIONS.map((c) => (
+                    <button
+                      key={c.id}
+                      type="button"
+                      title={c.label}
+                      onClick={() => setNewCategoryColor(c.id)}
+                      className={`w-6 h-6 rounded-full ${c.class} transition-transform flex items-center justify-center ${
+                        newCategoryColor === c.id ? 'ring-2 ring-offset-2 ring-black dark:ring-white scale-110' : 'hover:scale-105'
+                      }`}
+                    />
+                  ))}
+                </div>
               </div>
               <div className="flex justify-end space-x-2 pt-2">
                 <button

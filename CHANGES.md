@@ -22,6 +22,11 @@ All notable changes and architectural overview for the **@shaarky Event Budget &
   - Wrapped `AnalyticsSummary`, `CategoryBadge`, and `StatusBadge` in `React.memo` to prevent unnecessary component re-renders when unrelated parent state updates.
 
 ### Fixed
+- **Category Selection & Default Categories Preservation**:
+  - Updated category store subscription to automatically merge `DEFAULT_CATEGORIES` with custom Firestore/Local Storage categories, ensuring default options never disappear from category dropdowns and filter selectors.
+- **Vibrant Category Tag Colors**:
+  - Enhanced `CategoryBadge` color mapping and added a deterministic fallback hashing algorithm (`VIBRANT_COLOR_CLASSES`) so custom/new categories are always assigned vibrant Notion-style tag colors instead of defaulting to plain gray.
+  - Added interactive tag color picker swatches (Blue, Green, Pink, Purple, Orange, Yellow, Brown, Gray) inside the "Create New Category" modal.
 - **Modal Positioning**:
   - Used React `createPortal` to render modal dialogs (`New Event`, `Edit Event`, `New Expense`, `New Category`) onto `document.body` to resolve top clipping and overflow issues caused by header CSS stacking contexts.
   - Added max-height constraint (`max-h-[90vh] overflow-y-auto`) to ensure full modal visibility and scrollability on all screens.
