@@ -7,6 +7,10 @@ All notable changes and architectural overview for the **@shaarky Event Budget &
 ## [Unreleased]
 
 ### Performance
+- **ExpenseTable memoization & search query optimization**:
+  - Wrapped `ExpenseTable` in `React.memo` to skip redundant re-renders when parent components update state that does not affect table props (e.g. dark mode toggling).
+  - Hoisted `searchQuery` lowercasing outside the `.filter()` loop in `useMemo` to run query normalization once per filter pass instead of up to $3N$ times.
+  - Added short-circuit logic (`!query`) to bypass string lowercasing and substring matching for all items when the search input is empty.
 - **Analytics calculations & Badge memoization**:
   - Optimized `AnalyticsSummary` calculations into a single-pass `useMemo` loop, reducing iteration complexity from $O(4N)$ to $O(N)$ and eliminating temporary intermediate array allocations.
   - Wrapped `AnalyticsSummary`, `CategoryBadge`, and `StatusBadge` in `React.memo` to prevent unnecessary component re-renders when unrelated parent state updates.
