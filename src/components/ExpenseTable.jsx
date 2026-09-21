@@ -249,7 +249,9 @@ export const ExpenseTable = React.memo(function ExpenseTable({
           {/* Export CSV Button */}
           <button
             onClick={exportToCSV}
-            className="px-3 py-2 rounded-xl bg-white dark:bg-[#191919] border border-[#E3E2E0] dark:border-[#2F2F2F] hover:bg-gray-100 dark:hover:bg-[#2B2B2B] transition-colors text-xs font-medium flex items-center space-x-1.5 text-gray-700 dark:text-gray-300"
+            disabled={filteredAndSortedExpenses.length === 0}
+            title={filteredAndSortedExpenses.length === 0 ? "No expenses available to export" : "Export expenses as CSV"}
+            className="px-3 py-2 rounded-xl bg-white dark:bg-[#191919] border border-[#E3E2E0] dark:border-[#2F2F2F] hover:bg-gray-100 dark:hover:bg-[#2B2B2B] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white dark:disabled:hover:bg-[#191919] transition-colors text-xs font-medium flex items-center space-x-1.5 text-gray-700 dark:text-gray-300"
           >
             <Download className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">Export CSV</span>
@@ -429,6 +431,7 @@ export const ExpenseTable = React.memo(function ExpenseTable({
                 <input
                   type="text"
                   required
+                  autoFocus
                   placeholder="e.g. Security & Staffing"
                   value={newCategoryLabel}
                   onChange={(e) => setNewCategoryLabel(e.target.value)}
@@ -497,6 +500,7 @@ export const ExpenseTable = React.memo(function ExpenseTable({
                 <input
                   type="text"
                   required
+                  autoFocus
                   placeholder="e.g. Catering Deposit"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
