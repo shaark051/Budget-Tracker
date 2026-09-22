@@ -315,36 +315,24 @@ export const ExpenseTable = React.memo(function ExpenseTable({
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="border-b border-[#E3E2E0] dark:border-[#2F2F2F] bg-[#F7F6F3]/50 dark:bg-[#202020]/50 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">
-              <th className="py-3 px-4" aria-sort={sortField === 'title' ? (sortDirection === 'asc' ? 'ascending' : 'descending') : 'none'}>
-                <button
-                  onClick={() => toggleSort('title')}
-                  aria-label={`Sort by expense title, currently ${sortField === 'title' ? (sortDirection === 'asc' ? 'ascending' : 'descending') : 'unsorted'}`}
-                  className="flex items-center space-x-1 hover:text-black dark:hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black dark:focus-visible:ring-white rounded px-1 -mx-1"
-                >
+              <th className="py-3 px-4">
+                <button onClick={() => toggleSort('title')} className="flex items-center space-x-1 hover:text-black dark:hover:text-white">
                   <span>Expense</span>
-                  <ArrowUpDown className={`w-3 h-3 transition-opacity ${sortField === 'title' ? 'opacity-100 text-black dark:text-white' : 'opacity-40'}`} />
+                  <ArrowUpDown className="w-3 h-3" />
                 </button>
               </th>
               <th className="py-3 px-4">Category</th>
-              <th className="py-3 px-4" aria-sort={sortField === 'amount' ? (sortDirection === 'asc' ? 'ascending' : 'descending') : 'none'}>
-                <button
-                  onClick={() => toggleSort('amount')}
-                  aria-label={`Sort by amount, currently ${sortField === 'amount' ? (sortDirection === 'asc' ? 'ascending' : 'descending') : 'unsorted'}`}
-                  className="flex items-center space-x-1 hover:text-black dark:hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black dark:focus-visible:ring-white rounded px-1 -mx-1"
-                >
+              <th className="py-3 px-4">
+                <button onClick={() => toggleSort('amount')} className="flex items-center space-x-1 hover:text-black dark:hover:text-white">
                   <span>Amount</span>
-                  <ArrowUpDown className={`w-3 h-3 transition-opacity ${sortField === 'amount' ? 'opacity-100 text-black dark:text-white' : 'opacity-40'}`} />
+                  <ArrowUpDown className="w-3 h-3" />
                 </button>
               </th>
               <th className="py-3 px-4">Status</th>
-              <th className="py-3 px-4" aria-sort={sortField === 'date' ? (sortDirection === 'asc' ? 'ascending' : 'descending') : 'none'}>
-                <button
-                  onClick={() => toggleSort('date')}
-                  aria-label={`Sort by date, currently ${sortField === 'date' ? (sortDirection === 'asc' ? 'ascending' : 'descending') : 'unsorted'}`}
-                  className="flex items-center space-x-1 hover:text-black dark:hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black dark:focus-visible:ring-white rounded px-1 -mx-1"
-                >
+              <th className="py-3 px-4">
+                <button onClick={() => toggleSort('date')} className="flex items-center space-x-1 hover:text-black dark:hover:text-white">
                   <span>Date</span>
-                  <ArrowUpDown className={`w-3 h-3 transition-opacity ${sortField === 'date' ? 'opacity-100 text-black dark:text-white' : 'opacity-40'}`} />
+                  <ArrowUpDown className="w-3 h-3" />
                 </button>
               </th>
               <th className="py-3 px-4 hidden md:table-cell">Vendor</th>
@@ -458,8 +446,6 @@ export const ExpenseTable = React.memo(function ExpenseTable({
                       key={c.id}
                       type="button"
                       title={c.label}
-                      aria-label={`${c.label} tag color`}
-                      aria-pressed={newCategoryColor === c.id}
                       onClick={() => setNewCategoryColor(c.id)}
                       className={`w-6 h-6 rounded-full ${c.class} transition-transform flex items-center justify-center ${
                         newCategoryColor === c.id ? 'ring-2 ring-offset-2 ring-black dark:ring-white scale-110' : 'hover:scale-105'
