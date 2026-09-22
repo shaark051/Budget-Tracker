@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Header } from './components/Header';
 import { AnalyticsSummary } from './components/AnalyticsSummary';
 import { ExpenseTable } from './components/ExpenseTable';
@@ -67,11 +67,12 @@ export default function App() {
     return () => unsubscribe();
   }, [currentEvent?.id]);
 
-  const handleAddEvent = async (eventData) => {
+  // Memoize handler so Header component props remain stable across renders
+  const handleAddEvent = useCallback(async (eventData) => {
     const newId = await addEvent(eventData);
     // Find newly added event or construct temporary view item
     setCurrentEvent({ id: newId, ...eventData });
-  };
+  }, []);
 
   return (
     <div className="min-h-screen bg-white dark:bg-[#191919] text-[#37352F] dark:text-[#D4D4D4] font-sans antialiased selection:bg-blue-100 dark:selection:bg-blue-900 transition-colors duration-200">

@@ -13,6 +13,8 @@ All notable changes and architectural overview for the **@shaarky Event Budget &
   - Added standard dialog ARIA attributes (`role="dialog"`, `aria-modal="true"`, `aria-labelledby`) to enhance screen reader support.
 
 ### Performance
+- **Header memoization & callback stabilization**:
+  - Wrapped `Header` in `React.memo` and stabilized `handleAddEvent` in `App.jsx` using `useCallback` to prevent redundant re-renders of the header navigation, modal dialogs, and event switcher dropdown whenever expense items or loading states update in `App`.
 - **ExpenseTable memoization & search query optimization**:
   - Wrapped `ExpenseTable` in `React.memo` to skip redundant re-renders when parent components update state that does not affect table props (e.g. dark mode toggling).
   - Hoisted `searchQuery` lowercasing outside the `.filter()` loop in `useMemo` to run query normalization once per filter pass instead of up to $3N$ times.
