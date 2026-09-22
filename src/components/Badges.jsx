@@ -72,11 +72,25 @@ export const StatusBadge = React.memo(function StatusBadge({ status }) {
   );
 });
 
+// Cache Intl.NumberFormat instances by currency code to avoid expensive constructor overhead
+// creating thousands of instances on every render cycle in lists/tables.
+const currencyFormatterCache = new Map();
+
+function getCurrencyFormatter(currency = 'USD') {
+  if (!currencyFormatterCache.has(currency)) {
+    currencyFormatterCache.set(
+      currency,
+      new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: currency,
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2,
+      })
+    );
+  }
+  return currencyFormatterCache.get(currency);
+}
+
 export function formatCurrency(amount, currency = 'USD') {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: currency,
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 2,
-  }).format(amount || 0);
+  return getCurrencyFormatter(currency).format(amount || 0);
 }
