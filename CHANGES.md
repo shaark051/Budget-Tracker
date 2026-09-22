@@ -6,6 +6,14 @@ All notable changes and architectural overview for the **@shaarky Event Budget &
 
 ## [Unreleased]
 
+### Features & Vendor Booking Advance Tracking
+- **Vendor Advance Payments & Remaining Balance Tracking**:
+  - Added support for recording advance/deposit payments on expense items (`advanceAmount`).
+  - Added "Advance / Deposit" input field with live remaining balance calculation in the expense item create/edit modal.
+  - Displayed inline advance paid and remaining balance due breakdown under amounts in the expense table list view.
+  - Updated CSV export to include "Advance Paid" and "Remaining Due" columns for offline vendor reporting.
+  - Updated `AnalyticsSummary` card stats to calculate and present total "Advance Paid" and "Remaining Due" across all vendor expenses in real-time.
+
 ### Accessibility & Micro-UX
 - **Modal Dialog Keyboard & Backdrop Navigation**:
   - Added `Escape` key keyboard listeners to close active modals (`New Event`, `Edit Event`, `New Expense`, `New Category`) and dropdowns.

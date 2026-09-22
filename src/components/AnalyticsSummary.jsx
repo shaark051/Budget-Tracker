@@ -9,18 +9,25 @@ export const AnalyticsSummary = React.memo(function AnalyticsSummary({ currentEv
   const currency = currentEvent.currency || 'USD';
   const totalBudget = parseFloat(currentEvent.budget) || 0;
 
-  // Single-pass computation of totalSpent, paidTotal, pendingTotal, and category breakdown.
+  // Single-pass computation of totalSpent, paidTotal, pendingTotal, totalAdvance, totalRemainingDue, and category breakdown.
   // Reduces array iterations from 4N to 1N and eliminates temporary array allocations.
-  const { totalSpent, paidTotal, pendingTotal, categorySorted } = useMemo(() => {
+  const { totalSpent, paidTotal, pendingTotal, totalAdvance, totalRemainingDue, categorySorted } = useMemo(() => {
     let spentSum = 0;
     let paidSum = 0;
     let pendingSum = 0;
+    let advanceSum = 0;
+    let remainingDueSum = 0;
     const catMap = {};
 
     for (let i = 0; i < expenses.length; i++) {
       const exp = expenses[i];
       const amount = parseFloat(exp.amount) || 0;
+      const advance = Math.min(amount, Math.max(0, parseFloat(exp.advanceAmount) || 0));
+      const remainingForExp = Math.max(0, amount - advance);
+
       spentSum += amount;
+      advanceSum += advance;
+      remainingDueSum += remainingForExp;
 
       if (exp.status === 'Paid') {
         paidSum += amount;
@@ -44,6 +51,8 @@ export const AnalyticsSummary = React.memo(function AnalyticsSummary({ currentEv
       totalSpent: spentSum,
       paidTotal: paidSum,
       pendingTotal: pendingSum,
+      totalAdvance: advanceSum,
+      totalRemainingDue: remainingDueSum,
       categorySorted: sortedCats,
     };
   }, [expenses]);
@@ -115,19 +124,19 @@ export const AnalyticsSummary = React.memo(function AnalyticsSummary({ currentEv
         {/* Payment Breakdown Card */}
         <div className="bg-[#F7F6F3] dark:bg-[#202020] border border-[#E3E2E0] dark:border-[#2F2F2F] rounded-2xl p-5 transition-transform hover:-translate-y-0.5 duration-200">
           <div className="flex items-center justify-between text-gray-500 dark:text-gray-400 text-xs font-medium mb-3">
-            <span>PAYMENT STATUS</span>
+            <span>VENDOR ADVANCES & DUE</span>
             <div className="w-7 h-7 rounded-lg bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400 flex items-center justify-center">
               <Clock className="w-4 h-4" />
             </div>
           </div>
           <div className="space-y-1.5">
             <div className="flex items-center justify-between text-xs">
-              <span className="text-emerald-700 dark:text-emerald-400 font-medium">Paid</span>
-              <span className="font-mono font-semibold text-[#37352F] dark:text-[#D4D4D4]">{formatCurrency(paidTotal, currency)}</span>
+              <span className="text-emerald-700 dark:text-emerald-400 font-medium">Advance Paid</span>
+              <span className="font-mono font-semibold text-[#37352F] dark:text-[#D4D4D4]">{formatCurrency(totalAdvance, currency)}</span>
             </div>
             <div className="flex items-center justify-between text-xs">
-              <span className="text-amber-700 dark:text-amber-400 font-medium">Pending</span>
-              <span className="font-mono font-semibold text-[#37352F] dark:text-[#D4D4D4]">{formatCurrency(pendingTotal, currency)}</span>
+              <span className="text-amber-700 dark:text-amber-400 font-medium">Remaining Due</span>
+              <span className="font-mono font-semibold text-[#37352F] dark:text-[#D4D4D4]">{formatCurrency(totalRemainingDue, currency)}</span>
             </div>
           </div>
         </div>
