@@ -16,7 +16,8 @@ import {
 import { formatCurrency } from './Badges';
 import { isFirebaseConfigured } from '../firebase';
 
-export function Header({
+// Wrapped with React.memo to prevent re-rendering header bar, modals, and event dropdowns when expense state updates in App
+export const Header = React.memo(function Header({
   events,
   currentEvent,
   onSelectEvent,
@@ -390,4 +391,4 @@ export function Header({
       )}
     </header>
   );
-}
+});
