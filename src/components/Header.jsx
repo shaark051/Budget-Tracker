@@ -100,6 +100,8 @@ export function Header({
         <div className="relative">
           <button
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+            aria-expanded={isDropdownOpen}
+            aria-haspopup="true"
             className="flex items-center space-x-2 px-3 py-1.5 rounded-lg hover:bg-[#F7F6F3] dark:hover:bg-[#202020] transition-colors border border-transparent hover:border-[#E3E2E0] dark:hover:border-[#2F2F2F] group"
           >
             <div className="w-8 h-8 rounded-lg bg-black text-white dark:bg-white dark:text-black flex items-center justify-center font-semibold text-sm shadow-sm group-hover:scale-105 transition-transform">
@@ -231,6 +233,7 @@ export function Header({
                 <input
                   type="text"
                   required
+                  autoFocus
                   placeholder="e.g. Annual Design Gala 2025"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
@@ -320,6 +323,7 @@ export function Header({
                 <input
                   type="text"
                   required
+                  autoFocus
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   className="w-full px-3 py-2 bg-[#F7F6F3] dark:bg-[#191919] border border-[#E3E2E0] dark:border-[#2F2F2F] rounded-lg focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white text-sm"
