@@ -72,5 +72,21 @@ export const StatusBadge = React.memo(function StatusBadge({ status }) {
   );
 });
 
+// Cache Intl.NumberFormat instances per currency to avoid expensive object creation on every call.
+// Constructing Intl.NumberFormat is ~50-100x slower than reusing an existing formatter.
+const formatterCache = new Map();
 
+export function formatCurrency(amount, currency = 'USD') {
+  const code = currency || 'USD';
+  let formatter = formatterCache.get(code);
+  if (!formatter) {
+    formatter = new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: code,
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 2,
+    });
+    formatterCache.set(code, formatter);
+  }
+  return formatter.format(amount || 0);
 }
