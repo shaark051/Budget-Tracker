@@ -11,6 +11,8 @@ All notable changes and architectural overview for the **@shaarky Event Budget &
   - Added `Escape` key keyboard listeners to close active modals (`New Event`, `Edit Event`, `New Expense`, `New Category`) and dropdowns.
   - Added backdrop overlay click-to-dismiss behavior for all modal dialogs.
   - Added standard dialog ARIA attributes (`role="dialog"`, `aria-modal="true"`, `aria-labelledby`) to enhance screen reader support.
+- **Category Swatch Focus-Visible Indicators**:
+  - Added distinct `focus-visible` ring/outline indicators (`focus-visible:ring-2 focus-visible:ring-offset-2`) to category tag color selection buttons in the "Create New Category" modal for improved keyboard accessibility.
 
 ### Performance
 - **ExpenseTable memoization & search query optimization**:

@@ -461,7 +461,7 @@ export const ExpenseTable = React.memo(function ExpenseTable({
                       aria-label={`${c.label} tag color`}
                       aria-pressed={newCategoryColor === c.id}
                       onClick={() => setNewCategoryColor(c.id)}
-                      className={`w-6 h-6 rounded-full ${c.class} transition-transform flex items-center justify-center ${
+                      className={`w-6 h-6 rounded-full ${c.class} transition-transform flex items-center justify-center focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-black dark:focus-visible:ring-white focus-visible:outline-none ${
                         newCategoryColor === c.id ? 'ring-2 ring-offset-2 ring-black dark:ring-white scale-110' : 'hover:scale-105'
                       }`}
                     />
