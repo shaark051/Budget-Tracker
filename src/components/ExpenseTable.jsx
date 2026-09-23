@@ -4,6 +4,8 @@ import {
   Search,
   Plus,
   ArrowUpDown,
+  ArrowUp,
+  ArrowDown,
   Download,
   Edit2,
   Trash2,
@@ -316,28 +318,54 @@ export const ExpenseTable = React.memo(function ExpenseTable({
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="border-b border-[#E3E2E0] dark:border-[#2F2F2F] bg-[#F7F6F3]/50 dark:bg-[#202020]/50 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">
-              <th className="py-3 px-4">
-                <button onClick={() => toggleSort('title')} className="flex items-center space-x-1 hover:text-black dark:hover:text-white">
-                  <span>Expense</span>
-                  <ArrowUpDown className="w-3 h-3" />
-                </button>
-              </th>
-              <th className="py-3 px-4">Category</th>
-              <th className="py-3 px-4">
-                <button onClick={() => toggleSort('amount')} className="flex items-center space-x-1 hover:text-black dark:hover:text-white">
-                  <span>Amount</span>
-                  <ArrowUpDown className="w-3 h-3" />
-                </button>
-              </th>
-              <th className="py-3 px-4">Status</th>
-              <th className="py-3 px-4">
-                <button onClick={() => toggleSort('date')} className="flex items-center space-x-1 hover:text-black dark:hover:text-white">
-                  <span>Date</span>
-                  <ArrowUpDown className="w-3 h-3" />
-                </button>
-              </th>
-              <th className="py-3 px-4 hidden md:table-cell">Vendor</th>
-              <th className="py-3 px-4 text-right">Actions</th>
+              {(() => {
+                const renderHeader = (field, label, extraClass = '') => {
+                  const isSorted = sortField === field;
+                  const ariaSort = isSorted
+                    ? sortDirection === 'asc'
+                      ? 'ascending'
+                      : 'descending'
+                    : 'none';
+                  const nextDir = isSorted && sortDirection === 'asc' ? 'descending' : 'ascending';
+
+                  return (
+                    <th key={field} aria-sort={ariaSort} className={`py-3 px-4 ${extraClass}`}>
+                      <button
+                        onClick={() => toggleSort(field)}
+                        aria-label={`Sort by ${label} ${nextDir}`}
+                        className={`flex items-center space-x-1 transition-colors ${
+                          isSorted
+                            ? 'text-black dark:text-white font-bold'
+                            : 'hover:text-black dark:hover:text-white'
+                        }`}
+                      >
+                        <span>{label}</span>
+                        {isSorted ? (
+                          sortDirection === 'asc' ? (
+                            <ArrowUp className="w-3 h-3 text-blue-600 dark:text-blue-400" />
+                          ) : (
+                            <ArrowDown className="w-3 h-3 text-blue-600 dark:text-blue-400" />
+                          )
+                        ) : (
+                          <ArrowUpDown className="w-3 h-3 opacity-50" />
+                        )}
+                      </button>
+                    </th>
+                  );
+                };
+
+                return (
+                  <>
+                    {renderHeader('title', 'Expense')}
+                    {renderHeader('category', 'Category')}
+                    {renderHeader('amount', 'Amount')}
+                    {renderHeader('status', 'Status')}
+                    {renderHeader('date', 'Date')}
+                    <th className="py-3 px-4 hidden md:table-cell">Vendor</th>
+                    <th className="py-3 px-4 text-right">Actions</th>
+                  </>
+                );
+              })()}
             </tr>
           </thead>
           <tbody className="divide-y divide-[#E3E2E0] dark:divide-[#2F2F2F] text-xs">
