@@ -145,43 +145,44 @@ export const ExpenseTable = React.memo(function ExpenseTable({
     setIsModalOpen(false);
   };
 
-  // Sort & Filter logic with optimized single query normalization and short-circuit evaluation
+  // Sort & Filter logic with pre-computed sort keys and single query normalization.
+  // Pre-computing sort key values once per item avoids O(N log N) redundant string lowercasing/parsing calls in .sort().
   const filteredAndSortedExpenses = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
 
-    return expenses
-      .filter((exp) => {
-        const matchesCat = selectedCategory === 'ALL' || exp.category === selectedCategory;
-        if (!matchesCat) return false;
+    const filtered = expenses.filter((exp) => {
+      const matchesCat = selectedCategory === 'ALL' || exp.category === selectedCategory;
+      if (!matchesCat) return false;
 
-        const matchesStatus = selectedStatus === 'ALL' || exp.status === selectedStatus;
-        if (!matchesStatus) return false;
+      const matchesStatus = selectedStatus === 'ALL' || exp.status === selectedStatus;
+      if (!matchesStatus) return false;
 
-        if (!query) return true;
+      if (!query) return true;
 
-        const matchesSearch =
-          (exp.title && exp.title.toLowerCase().includes(query)) ||
-          (exp.vendor && exp.vendor.toLowerCase().includes(query)) ||
-          (exp.notes && exp.notes.toLowerCase().includes(query));
+      return (
+        (exp.title && exp.title.toLowerCase().includes(query)) ||
+        (exp.vendor && exp.vendor.toLowerCase().includes(query)) ||
+        (exp.notes && exp.notes.toLowerCase().includes(query))
+      );
+    });
 
-        return matchesSearch;
-      })
-      .sort((a, b) => {
-        let valA = a[sortField];
-        let valB = b[sortField];
+    const isNumericSort = sortField === 'amount';
+    const isAsc = sortDirection === 'asc';
 
-        if (sortField === 'amount') {
-          valA = parseFloat(valA) || 0;
-          valB = parseFloat(valB) || 0;
-        } else {
-          valA = String(valA || '').toLowerCase();
-          valB = String(valB || '').toLowerCase();
-        }
+    // Map to objects with pre-computed key value to eliminate repeated conversion inside comparator loop
+    const mapped = filtered.map((exp) => {
+      const raw = exp[sortField];
+      const key = isNumericSort ? (parseFloat(raw) || 0) : String(raw || '').toLowerCase();
+      return { exp, key };
+    });
 
-        if (valA < valB) return sortDirection === 'asc' ? -1 : 1;
-        if (valA > valB) return sortDirection === 'asc' ? 1 : -1;
-        return 0;
-      });
+    mapped.sort((a, b) => {
+      if (a.key < b.key) return isAsc ? -1 : 1;
+      if (a.key > b.key) return isAsc ? 1 : -1;
+      return 0;
+    });
+
+    return mapped.map(item => item.exp);
   }, [expenses, searchQuery, selectedCategory, selectedStatus, sortField, sortDirection]);
 
   const toggleSort = (field) => {

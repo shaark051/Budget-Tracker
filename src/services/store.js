@@ -178,13 +178,15 @@ function getLocalCategories() {
   }
 }
 
+// Hoisted Set of default category labels (lowercased) to prevent re-allocating a Set on every subscription snapshot
+const DEFAULT_CATEGORY_LABELS_SET = new Set(DEFAULT_CATEGORIES.map(c => c.label.toLowerCase()));
+
 /** Merge default categories with custom categories ensuring no duplicate labels */
 function mergeCategories(customCategories) {
   const merged = [...DEFAULT_CATEGORIES];
-  const defaultLabels = new Set(DEFAULT_CATEGORIES.map(c => c.label.toLowerCase()));
 
   for (const cat of customCategories) {
-    if (cat.label && !defaultLabels.has(cat.label.toLowerCase())) {
+    if (cat.label && !DEFAULT_CATEGORY_LABELS_SET.has(cat.label.toLowerCase())) {
       merged.push(cat);
     }
   }
