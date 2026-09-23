@@ -17,10 +17,13 @@ All notable changes and architectural overview for the **@shaarky Event Budget &
 ### Performance
 - **Header memoization & callback stabilization**:
   - Wrapped `Header` in `React.memo` and stabilized `handleAddEvent` in `App.jsx` using `useCallback` to prevent redundant re-renders of the header navigation, modal dialogs, and event switcher dropdown whenever expense items or loading states update in `App`.
-- **ExpenseTable memoization & search query optimization**:
+- **ExpenseTable memoization & search/sorting key optimization**:
   - Wrapped `ExpenseTable` in `React.memo` to skip redundant re-renders when parent components update state that does not affect table props (e.g. dark mode toggling).
+  - Pre-computed sort keys once per item in `useMemo` before sorting, eliminating $O(N \log N)$ redundant string lowercasing and float parsing conversions inside JavaScript's sort comparator.
   - Hoisted `searchQuery` lowercasing outside the `.filter()` loop in `useMemo` to run query normalization once per filter pass instead of up to $3N$ times.
   - Added short-circuit logic (`!query`) to bypass string lowercasing and substring matching for all items when the search input is empty.
+- **Category labels Set hoisting**:
+  - Hoisted `DEFAULT_CATEGORY_LABELS_SET` to module scope in `src/services/store.js` to avoid re-allocating a `Set` on every category snapshot subscription event.
 - **Analytics calculations & Badge memoization**:
   - Optimized `AnalyticsSummary` calculations into a single-pass `useMemo` loop, reducing iteration complexity from $O(4N)$ to $O(N)$ and eliminating temporary intermediate array allocations.
   - Wrapped `AnalyticsSummary`, `CategoryBadge`, and `StatusBadge` in `React.memo` to prevent unnecessary component re-renders when unrelated parent state updates.
