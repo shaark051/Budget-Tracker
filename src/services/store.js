@@ -213,6 +213,7 @@ export function subscribeToCategories(callback) {
     window.addEventListener('storage', handleStorage);
     window.addEventListener(STORE_UPDATE_EVENT, handleStorage);
     return () => {
+      // Unbind both storage and custom STORE_UPDATE_EVENT to prevent event listener leaks when switching events
       window.removeEventListener('storage', handleStorage);
       window.removeEventListener(STORE_UPDATE_EVENT, handleStorage);
     };
