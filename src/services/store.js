@@ -60,10 +60,11 @@ const DEFAULT_EXPENSES = [
     title: 'Convention Center Main Hall Deposit',
     category: 'Venue & Location',
     amount: 12500,
-    status: 'Paid',
+    advanceAmount: 5000,
+    status: 'Pending',
     date: '2025-04-12',
     vendor: 'Grand City Center',
-    notes: '50% initial non-refundable deposit',
+    notes: '50% initial non-refundable deposit paid ($5,000 paid, $7,500 due)',
     createdAt: new Date().toISOString()
   },
   {
@@ -72,10 +73,11 @@ const DEFAULT_EXPENSES = [
     title: 'Gourmet Catering & Coffee Bar',
     category: 'Catering & Food',
     amount: 8200,
+    advanceAmount: 2000,
     status: 'Pending',
     date: '2025-04-14',
     vendor: 'Artisan Eats Co.',
-    notes: 'Breakfast pastries & plated lunch for 300 guests',
+    notes: 'Breakfast pastries & plated lunch for 300 guests ($2,000 advance paid)',
     createdAt: new Date().toISOString()
   },
   {
@@ -84,10 +86,11 @@ const DEFAULT_EXPENSES = [
     title: 'Keynote LED Wall & Sound Rigging',
     category: 'AV & Tech Support',
     amount: 6400,
+    advanceAmount: 6400,
     status: 'Paid',
     date: '2025-04-10',
     vendor: 'ProLight & Audio',
-    notes: 'Includes 2 on-site technicians',
+    notes: 'Includes 2 on-site technicians (Paid in full)',
     createdAt: new Date().toISOString()
   },
   {
@@ -96,10 +99,11 @@ const DEFAULT_EXPENSES = [
     title: 'Keynote Speaker Honorarium',
     category: 'Entertainment & Speakers',
     amount: 5000,
+    advanceAmount: 1500,
     status: 'Approved',
     date: '2025-04-15',
     vendor: 'Dr. Sarah Jenkins',
-    notes: 'Travel allowance included in total',
+    notes: 'Travel allowance included ($1,500 retainer paid)',
     createdAt: new Date().toISOString()
   },
   {
@@ -108,6 +112,7 @@ const DEFAULT_EXPENSES = [
     title: 'Social Media & Billboard Campaign',
     category: 'Marketing & Media',
     amount: 3200,
+    advanceAmount: 3200,
     status: 'Paid',
     date: '2025-03-28',
     vendor: 'Pulse Digital Agency',
@@ -120,6 +125,7 @@ const DEFAULT_EXPENSES = [
     title: 'Eco-friendly Lanyards & Badges',
     category: 'Decor & Staging',
     amount: 1100,
+    advanceAmount: 1100,
     status: 'Paid',
     date: '2025-04-01',
     vendor: 'GreenPrint Promo',
