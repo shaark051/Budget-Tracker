@@ -253,8 +253,9 @@ export const ExpenseTable = React.memo(function ExpenseTable({
           <button
             onClick={exportToCSV}
             disabled={filteredAndSortedExpenses.length === 0}
+            aria-label="Export CSV"
             title={filteredAndSortedExpenses.length === 0 ? "No expenses available to export" : "Export expenses as CSV"}
-            className="px-3 py-2 rounded-xl bg-white dark:bg-[#191919] border border-[#E3E2E0] dark:border-[#2F2F2F] hover:bg-gray-100 dark:hover:bg-[#2B2B2B] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white dark:disabled:hover:bg-[#191919] transition-colors text-xs font-medium flex items-center space-x-1.5 text-gray-700 dark:text-gray-300"
+            className="px-3 py-2 rounded-xl bg-white dark:bg-[#191919] border border-[#E3E2E0] dark:border-[#2F2F2F] hover:bg-gray-100 dark:hover:bg-[#2B2B2B] focus-visible:ring-2 focus-visible:ring-black dark:focus-visible:ring-white disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white dark:disabled:hover:bg-[#191919] transition-colors text-xs font-medium flex items-center space-x-1.5 text-gray-700 dark:text-gray-300"
           >
             <Download className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">Export CSV</span>
@@ -525,8 +526,9 @@ export const ExpenseTable = React.memo(function ExpenseTable({
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-xs font-medium text-gray-500 mb-1">Title / Item</label>
+                <label htmlFor="expense-title" className="block text-xs font-medium text-gray-500 mb-1">Title / Item</label>
                 <input
+                  id="expense-title"
                   type="text"
                   required
                   autoFocus
@@ -540,7 +542,7 @@ export const ExpenseTable = React.memo(function ExpenseTable({
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <div className="flex items-center justify-between mb-1">
-                    <label className="block text-xs font-medium text-gray-500">Category</label>
+                    <label htmlFor="expense-category" className="block text-xs font-medium text-gray-500">Category</label>
                     <button
                       type="button"
                       onClick={() => setIsCategoryModalOpen(true)}
@@ -551,6 +553,7 @@ export const ExpenseTable = React.memo(function ExpenseTable({
                     </button>
                   </div>
                   <select
+                    id="expense-category"
                     value={category}
                     onChange={(e) => setCategory(e.target.value)}
                     className="w-full px-3 py-2 bg-[#F7F6F3] dark:bg-[#191919] border border-[#E3E2E0] dark:border-[#2F2F2F] rounded-lg focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white text-sm"
@@ -561,8 +564,9 @@ export const ExpenseTable = React.memo(function ExpenseTable({
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-gray-500 mb-1">Amount ({currency})</label>
+                  <label htmlFor="expense-amount" className="block text-xs font-medium text-gray-500 mb-1">Amount ({currency})</label>
                   <input
+                    id="expense-amount"
                     type="number"
                     required
                     min="0"
@@ -577,8 +581,9 @@ export const ExpenseTable = React.memo(function ExpenseTable({
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-medium text-gray-500 mb-1">Status</label>
+                  <label htmlFor="expense-status" className="block text-xs font-medium text-gray-500 mb-1">Status</label>
                   <select
+                    id="expense-status"
                     value={status}
                     onChange={(e) => setStatus(e.target.value)}
                     className="w-full px-3 py-2 bg-[#F7F6F3] dark:bg-[#191919] border border-[#E3E2E0] dark:border-[#2F2F2F] rounded-lg focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white text-sm"
@@ -589,8 +594,9 @@ export const ExpenseTable = React.memo(function ExpenseTable({
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-gray-500 mb-1">Date</label>
+                  <label htmlFor="expense-date" className="block text-xs font-medium text-gray-500 mb-1">Date</label>
                   <input
+                    id="expense-date"
                     type="date"
                     value={date}
                     onChange={(e) => setDate(e.target.value)}
@@ -600,8 +606,9 @@ export const ExpenseTable = React.memo(function ExpenseTable({
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-gray-500 mb-1">Vendor / Payee</label>
+                <label htmlFor="expense-vendor" className="block text-xs font-medium text-gray-500 mb-1">Vendor / Payee</label>
                 <input
+                  id="expense-vendor"
                   type="text"
                   placeholder="e.g. Acme Event Services"
                   value={vendor}
@@ -611,8 +618,9 @@ export const ExpenseTable = React.memo(function ExpenseTable({
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-gray-500 mb-1">Notes</label>
+                <label htmlFor="expense-notes" className="block text-xs font-medium text-gray-500 mb-1">Notes</label>
                 <textarea
+                  id="expense-notes"
                   rows="2"
                   placeholder="Additional invoice numbers, references..."
                   value={notes}
