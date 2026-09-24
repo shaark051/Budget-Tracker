@@ -83,6 +83,7 @@ export const ExpenseTable = React.memo(function ExpenseTable({
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState(categories[0]?.label || DEFAULT_CATEGORIES[0].label);
   const [amount, setAmount] = useState('');
+  const [advanceAmount, setAdvanceAmount] = useState('');
   const [status, setStatus] = useState('Paid');
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [vendor, setVendor] = useState('');
@@ -105,6 +106,7 @@ export const ExpenseTable = React.memo(function ExpenseTable({
     setTitle('');
     setCategory(DEFAULT_CATEGORIES[0].label);
     setAmount('');
+    setAdvanceAmount('');
     setStatus('Paid');
     setDate(new Date().toISOString().split('T')[0]);
     setVendor('');
@@ -116,7 +118,8 @@ export const ExpenseTable = React.memo(function ExpenseTable({
     setEditingExpense(expense);
     setTitle(expense.title || '');
     setCategory(expense.category || DEFAULT_CATEGORIES[0].label);
-    setAmount(expense.amount || '');
+    setAmount(expense.amount !== undefined && expense.amount !== null ? expense.amount : '');
+    setAdvanceAmount(expense.advanceAmount !== undefined && expense.advanceAmount !== null ? expense.advanceAmount : '');
     setStatus(expense.status || 'Paid');
     setDate(expense.date || new Date().toISOString().split('T')[0]);
     setVendor(expense.vendor || '');
@@ -128,10 +131,14 @@ export const ExpenseTable = React.memo(function ExpenseTable({
     e.preventDefault();
     if (!title.trim() || !amount) return;
 
+    const parsedAmount = parseFloat(amount) || 0;
+    const parsedAdvance = Math.min(Math.max(0, parseFloat(advanceAmount) || 0), parsedAmount);
+
     const payload = {
       title: title.trim(),
       category,
-      amount: parseFloat(amount) || 0,
+      amount: parsedAmount,
+      advanceAmount: parsedAdvance,
       status,
       date,
       vendor: vendor.trim(),
@@ -199,16 +206,23 @@ export const ExpenseTable = React.memo(function ExpenseTable({
   // CSV Export
   const exportToCSV = () => {
     if (expenses.length === 0) return;
-    const headers = ['Title', 'Category', 'Amount', 'Status', 'Date', 'Vendor', 'Notes'];
-    const rows = filteredAndSortedExpenses.map(e => [
-      `"${e.title || ''}"`,
-      `"${e.category || ''}"`,
-      e.amount || 0,
-      `"${e.status || ''}"`,
-      `"${e.date || ''}"`,
-      `"${e.vendor || ''}"`,
-      `"${e.notes || ''}"`
-    ]);
+    const headers = ['Title', 'Category', 'Total Amount', 'Advance Paid', 'Remaining Due', 'Status', 'Date', 'Vendor', 'Notes'];
+    const rows = filteredAndSortedExpenses.map(e => {
+      const tot = parseFloat(e.amount) || 0;
+      const adv = Math.min(tot, Math.max(0, parseFloat(e.advanceAmount) || 0));
+      const rem = Math.max(0, tot - adv);
+      return [
+        `"${e.title || ''}"`,
+        `"${e.category || ''}"`,
+        tot,
+        adv,
+        rem,
+        `"${e.status || ''}"`,
+        `"${e.date || ''}"`,
+        `"${e.vendor || ''}"`,
+        `"${e.notes || ''}"`
+      ];
+    });
 
     const csvContent = 'data:text/csv;charset=utf-8,'
       + [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
@@ -393,8 +407,28 @@ export const ExpenseTable = React.memo(function ExpenseTable({
                   <td className="py-3 px-4 whitespace-nowrap">
                     <CategoryBadge category={exp.category} />
                   </td>
-                  <td className="py-3 px-4 font-mono font-semibold text-[#37352F] dark:text-[#D4D4D4] whitespace-nowrap">
-                    {formatCurrency(exp.amount, currency)}
+              <td className="py-3 px-4 font-mono text-[#37352F] dark:text-[#D4D4D4] whitespace-nowrap">
+                <div className="font-semibold">{formatCurrency(exp.amount, currency)}</div>
+                {(() => {
+                  const tot = parseFloat(exp.amount) || 0;
+                  const adv = Math.min(tot, Math.max(0, parseFloat(exp.advanceAmount) || 0));
+                  const rem = Math.max(0, tot - adv);
+                  if (adv > 0) {
+                    return (
+                      <div className="text-[10px] text-gray-500 font-normal space-y-0.5">
+                        <span className="text-emerald-600 dark:text-emerald-400">
+                          Advance: {formatCurrency(adv, currency)}
+                        </span>
+                        {rem > 0 && (
+                          <span className="ml-1 text-amber-600 dark:text-amber-400">
+                            | Due: {formatCurrency(rem, currency)}
+                          </span>
+                        )}
+                      </div>
+                    );
+                  }
+                  return null;
+                })()}
                   </td>
                   <td className="py-3 px-4 whitespace-nowrap">
                     <StatusBadge status={exp.status} />
@@ -581,6 +615,25 @@ export const ExpenseTable = React.memo(function ExpenseTable({
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
+                  <label htmlFor="expense-advance" className="block text-xs font-medium text-gray-500 mb-1">Advance / Deposit ({currency})</label>
+                  <input
+                    id="expense-advance"
+                    type="number"
+                    min="0"
+                    max={amount || undefined}
+                    step="any"
+                    placeholder="0.00"
+                    value={advanceAmount}
+                    onChange={(e) => setAdvanceAmount(e.target.value)}
+                    className="w-full px-3 py-2 bg-[#F7F6F3] dark:bg-[#191919] border border-[#E3E2E0] dark:border-[#2F2F2F] rounded-lg focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white text-sm font-mono"
+                  />
+                  {amount > 0 && (
+                    <p className="text-[10px] text-gray-400 mt-1 font-mono">
+                      Due: {formatCurrency(Math.max(0, (parseFloat(amount) || 0) - (Math.min(parseFloat(amount) || 0, Math.max(0, parseFloat(advanceAmount) || 0)))), currency)}
+                    </p>
+                  )}
+                </div>
+                <div>
                   <label htmlFor="expense-status" className="block text-xs font-medium text-gray-500 mb-1">Status</label>
                   <select
                     id="expense-status"
@@ -593,16 +646,17 @@ export const ExpenseTable = React.memo(function ExpenseTable({
                     ))}
                   </select>
                 </div>
-                <div>
-                  <label htmlFor="expense-date" className="block text-xs font-medium text-gray-500 mb-1">Date</label>
-                  <input
-                    id="expense-date"
-                    type="date"
-                    value={date}
-                    onChange={(e) => setDate(e.target.value)}
-                    className="w-full px-3 py-2 bg-[#F7F6F3] dark:bg-[#191919] border border-[#E3E2E0] dark:border-[#2F2F2F] rounded-lg focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white text-sm"
-                  />
-                </div>
+              </div>
+
+              <div>
+                <label htmlFor="expense-date" className="block text-xs font-medium text-gray-500 mb-1">Date</label>
+                <input
+                  id="expense-date"
+                  type="date"
+                  value={date}
+                  onChange={(e) => setDate(e.target.value)}
+                  className="w-full px-3 py-2 bg-[#F7F6F3] dark:bg-[#191919] border border-[#E3E2E0] dark:border-[#2F2F2F] rounded-lg focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white text-sm"
+                />
               </div>
 
               <div>
