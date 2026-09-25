@@ -386,8 +386,33 @@ export const ExpenseTable = React.memo(function ExpenseTable({
           <tbody className="divide-y divide-[#E3E2E0] dark:divide-[#2F2F2F] text-xs">
             {filteredAndSortedExpenses.length === 0 ? (
               <tr>
-                <td colSpan="7" className="py-8 text-center text-gray-400">
-                  No expense items match your criteria.
+                <td colSpan="7" className="py-12 text-center text-gray-500 dark:text-gray-400">
+                  {expenses.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center space-y-3">
+                      <p className="text-sm font-medium text-[#37352F] dark:text-[#D4D4D4]">No expenses logged yet</p>
+                      <button
+                        onClick={openAddModal}
+                        className="px-3.5 py-2 rounded-xl bg-black text-white dark:bg-white dark:text-black text-xs font-semibold hover:opacity-90 transition-opacity inline-flex items-center space-x-1.5 shadow-sm focus-visible:ring-2 focus-visible:ring-black dark:focus-visible:ring-white focus:outline-none"
+                      >
+                        <Plus className="w-3.5 h-3.5" />
+                        <span>Add First Expense</span>
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center justify-center space-y-2">
+                      <p className="text-sm">No expenses match your search or filters.</p>
+                      <button
+                        onClick={() => {
+                          setSearchQuery('');
+                          setSelectedCategory('ALL');
+                          setSelectedStatus('ALL');
+                        }}
+                        className="text-xs text-blue-600 dark:text-blue-400 hover:underline font-medium focus-visible:ring-2 focus-visible:ring-blue-500 rounded px-1 focus:outline-none"
+                      >
+                        Clear all filters
+                      </button>
+                    </div>
+                  )}
                 </td>
               </tr>
             ) : (
@@ -510,6 +535,7 @@ export const ExpenseTable = React.memo(function ExpenseTable({
                       key={c.id}
                       type="button"
                       title={c.label}
+                      aria-label={`Select ${c.label} category color`}
                       onClick={() => setNewCategoryColor(c.id)}
                       className={`w-6 h-6 rounded-full ${c.class} transition-transform flex items-center justify-center focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-black dark:focus-visible:ring-white focus-visible:outline-none ${
                         newCategoryColor === c.id ? 'ring-2 ring-offset-2 ring-black dark:ring-white scale-110' : 'hover:scale-105'
