@@ -48,6 +48,7 @@ All notable changes and architectural overview for the **@shaarky Event Budget &
 - **Cloudflare Wrangler Deployment**:
   - Configured `"not_found_handling": "single-page-application"` in `wrangler.jsonc` to support single-page application route fallback.
   - Removed `public/_redirects` to resolve Cloudflare Wrangler asset validation error (infinite loop check).
+  - Updated Node.js version specifications (`.nvmrc`, `.node-version`, and `package.json` engines) to Node.js 22+ to fix Wrangler 4+ engine requirement deployment failures.
 
 ---
 
