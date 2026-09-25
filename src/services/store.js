@@ -137,8 +137,9 @@ const DEFAULT_EXPENSES = [
 // Helper to load local storage
 const STORE_UPDATE_EVENT = 'app_store_updated';
 
+// Dispatch custom event to notify current tab listeners without triggering redundant 'storage' event dispatches.
+// Native browser 'storage' events are automatically dispatched by the browser to other tabs on localStorage changes.
 function notifyLocalChange() {
-  window.dispatchEvent(new Event('storage'));
   window.dispatchEvent(new Event(STORE_UPDATE_EVENT));
 }
 
