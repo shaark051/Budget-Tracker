@@ -200,8 +200,9 @@ export const Header = React.memo(function Header({
 
           <button
             onClick={() => setDarkMode(!darkMode)}
-            className="p-2 rounded-lg bg-[#F7F6F3] dark:bg-[#202020] border border-[#E3E2E0] dark:border-[#2F2F2F] hover:bg-gray-200 dark:hover:bg-[#2B2B2B] transition-colors"
-            aria-label="Toggle Theme"
+            className="p-2 rounded-lg bg-[#F7F6F3] dark:bg-[#202020] border border-[#E3E2E0] dark:border-[#2F2F2F] hover:bg-gray-200 dark:hover:bg-[#2B2B2B] transition-colors focus-visible:ring-2 focus-visible:ring-black dark:focus-visible:ring-white focus:outline-none"
+            aria-label={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+            title={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
           >
             {darkMode ? (
               <Sun className="w-4 h-4 text-amber-400" />
