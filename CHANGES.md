@@ -23,6 +23,10 @@ All notable changes and architectural overview for the **@shaarky Event Budget &
   - Added distinct `focus-visible` ring/outline indicators (`focus-visible:ring-2 focus-visible:ring-offset-2`) to category tag color selection buttons in the "Create New Category" modal for improved keyboard accessibility.
 
 ### Performance
+- **Fine-grained store subscription events & storage key filtering**:
+  - Replaced generic global store update events with fine-grained custom events (`app_events_updated`, `app_expenses_updated`, `app_categories_updated`) in `src/services/store.js`. Modifying expenses or categories now only triggers listeners for that specific entity type rather than re-evaluating all subscribers across the entire application.
+  - Added `e.key` filtering to cross-tab `storage` event listeners so local storage updates in one entity type skip re-reads and re-evaluations in unrelated stores.
+  - Optimized `currentEvent` state retention in `src/App.jsx` to preserve existing object references when matched event properties (`id`, `name`, `description`, `budget`, `currency`) are unchanged, preventing cascading React component re-renders across header navigation and analytics components.
 - **Header memoization & callback stabilization**:
   - Wrapped `Header` in `React.memo` and stabilized `handleAddEvent` in `App.jsx` using `useCallback` to prevent redundant re-renders of the header navigation, modal dialogs, and event switcher dropdown whenever expense items or loading states update in `App`.
 - **ExpenseTable memoization & search/sorting key optimization**:
