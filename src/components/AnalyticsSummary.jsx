@@ -145,16 +145,28 @@ export const AnalyticsSummary = React.memo(function AnalyticsSummary({ currentEv
 
       {/* Category Spending Bar Visualizer */}
       {categorySorted.length > 0 && (
-        <div className="bg-[#F7F6F3] dark:bg-[#202020] border border-[#E3E2E0] dark:border-[#2F2F2F] rounded-2xl p-5">
+        <section
+          aria-label="Category spending breakdown"
+          className="bg-[#F7F6F3] dark:bg-[#202020] border border-[#E3E2E0] dark:border-[#2F2F2F] rounded-2xl p-5"
+        >
           <h4 className="text-xs font-semibold text-gray-500 dark:text-gray-400 tracking-wider uppercase mb-3">
             Category Breakdown
           </h4>
 
           {/* Multi-segment progress bar */}
-          <div className="w-full h-3 bg-gray-200 dark:bg-[#2F2F2F] rounded-full overflow-hidden flex mb-4">
+          <div
+            role="region"
+            aria-label="Category spending proportion bar"
+            className="w-full h-3 bg-gray-200 dark:bg-[#2F2F2F] rounded-full overflow-hidden flex mb-4"
+          >
             {categorySorted.map((item, idx) => (
               <div
                 key={item.cat}
+                role="progressbar"
+                aria-valuenow={Math.round(item.pct)}
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-valuetext={`${item.cat}: ${formatCurrency(item.amount, currency)}, ${Math.round(item.pct)}% of total expenses`}
                 style={{ width: `${item.pct}%` }}
                 title={`${item.cat}: ${formatCurrency(item.amount, currency)} (${Math.round(item.pct)}%)`}
                 className={`h-full transition-all duration-300 ${
@@ -183,7 +195,7 @@ export const AnalyticsSummary = React.memo(function AnalyticsSummary({ currentEv
               </div>
             ))}
           </div>
-        </div>
+        </section>
       )}
     </div>
   );
