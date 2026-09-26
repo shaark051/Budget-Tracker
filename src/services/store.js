@@ -134,13 +134,15 @@ const DEFAULT_EXPENSES = [
   }
 ];
 
-// Helper to load local storage
-const STORE_UPDATE_EVENT = 'app_store_updated';
+// Specific custom event names for fine-grained store updates
+const STORE_UPDATE_EVENTS = 'app_events_updated';
+const STORE_UPDATE_EXPENSES = 'app_expenses_updated';
+const STORE_UPDATE_CATEGORIES = 'app_categories_updated';
 
-// Dispatch custom event to notify current tab listeners without triggering redundant 'storage' event dispatches.
+// Dispatch fine-grained custom event to notify current tab listeners for a specific entity type only.
 // Native browser 'storage' events are automatically dispatched by the browser to other tabs on localStorage changes.
-function notifyLocalChange() {
-  window.dispatchEvent(new Event(STORE_UPDATE_EVENT));
+function notifyLocalChange(eventName) {
+  window.dispatchEvent(new Event(eventName));
 }
 
 function getLocalEvents() {
@@ -216,13 +218,17 @@ export function subscribeToCategories(callback) {
     });
   } else {
     callback(mergeCategories(getLocalCategories()));
-    const handleStorage = () => callback(mergeCategories(getLocalCategories()));
+    const handleStorage = (e) => {
+      if (!e || !e.key || e.key === LOCAL_STORAGE_KEY_CATEGORIES) {
+        callback(mergeCategories(getLocalCategories()));
+      }
+    };
     window.addEventListener('storage', handleStorage);
-    window.addEventListener(STORE_UPDATE_EVENT, handleStorage);
+    window.addEventListener(STORE_UPDATE_CATEGORIES, handleStorage);
     return () => {
-      // Unbind both storage and custom STORE_UPDATE_EVENT to prevent event listener leaks when switching events
+      // Unbind storage and fine-grained custom event listener to prevent leaks
       window.removeEventListener('storage', handleStorage);
-      window.removeEventListener(STORE_UPDATE_EVENT, handleStorage);
+      window.removeEventListener(STORE_UPDATE_CATEGORIES, handleStorage);
     };
   }
 }
@@ -258,7 +264,7 @@ export async function addCategory(categoryData) {
   };
   categories.push(newCat);
   localStorage.setItem(LOCAL_STORAGE_KEY_CATEGORIES, JSON.stringify(categories));
-  notifyLocalChange();
+  notifyLocalChange(STORE_UPDATE_CATEGORIES);
   return newCat;
 }
 
@@ -278,12 +284,16 @@ export function subscribeToEvents(callback) {
     });
   } else {
     callback(getLocalEvents());
-    const handleStorage = () => callback(getLocalEvents());
+    const handleStorage = (e) => {
+      if (!e || !e.key || e.key === LOCAL_STORAGE_KEY_EVENTS) {
+        callback(getLocalEvents());
+      }
+    };
     window.addEventListener('storage', handleStorage);
-    window.addEventListener(STORE_UPDATE_EVENT, handleStorage);
+    window.addEventListener(STORE_UPDATE_EVENTS, handleStorage);
     return () => {
       window.removeEventListener('storage', handleStorage);
-      window.removeEventListener(STORE_UPDATE_EVENT, handleStorage);
+      window.removeEventListener(STORE_UPDATE_EVENTS, handleStorage);
     };
   }
 }
@@ -314,12 +324,16 @@ export function subscribeToExpenses(eventId, callback) {
       callback(filtered);
     };
     filterAndSend();
-    const handleStorage = () => filterAndSend();
+    const handleStorage = (e) => {
+      if (!e || !e.key || e.key === LOCAL_STORAGE_KEY_EXPENSES) {
+        filterAndSend();
+      }
+    };
     window.addEventListener('storage', handleStorage);
-    window.addEventListener(STORE_UPDATE_EVENT, handleStorage);
+    window.addEventListener(STORE_UPDATE_EXPENSES, handleStorage);
     return () => {
       window.removeEventListener('storage', handleStorage);
-      window.removeEventListener(STORE_UPDATE_EVENT, handleStorage);
+      window.removeEventListener(STORE_UPDATE_EXPENSES, handleStorage);
     };
   }
 }
@@ -347,7 +361,7 @@ export async function addEvent(eventData) {
   };
   events.push(newEvent);
   localStorage.setItem(LOCAL_STORAGE_KEY_EVENTS, JSON.stringify(events));
-  notifyLocalChange();
+  notifyLocalChange(STORE_UPDATE_EVENTS);
   return newEvent.id;
 }
 
@@ -365,7 +379,7 @@ export async function updateEvent(eventId, updateData) {
 
   const events = getLocalEvents().map(e => e.id === eventId ? { ...e, ...updateData } : e);
   localStorage.setItem(LOCAL_STORAGE_KEY_EVENTS, JSON.stringify(events));
-  notifyLocalChange();
+  notifyLocalChange(STORE_UPDATE_EVENTS);
 }
 
 /** Delete Event */
@@ -384,7 +398,8 @@ export async function deleteEvent(eventId) {
   const expenses = getLocalExpenses().filter(e => e.eventId !== eventId);
   localStorage.setItem(LOCAL_STORAGE_KEY_EVENTS, JSON.stringify(events));
   localStorage.setItem(LOCAL_STORAGE_KEY_EXPENSES, JSON.stringify(expenses));
-  notifyLocalChange();
+  notifyLocalChange(STORE_UPDATE_EVENTS);
+  notifyLocalChange(STORE_UPDATE_EXPENSES);
 }
 
 /** Add Expense */
@@ -411,7 +426,7 @@ export async function addExpense(eventId, expenseData) {
   };
   expenses.push(newExpense);
   localStorage.setItem(LOCAL_STORAGE_KEY_EXPENSES, JSON.stringify(expenses));
-  notifyLocalChange();
+  notifyLocalChange(STORE_UPDATE_EXPENSES);
   return newExpense.id;
 }
 
@@ -431,7 +446,7 @@ export async function updateExpense(eventId, expenseId, updateData) {
     exp.id === expenseId ? { ...exp, ...updateData } : exp
   );
   localStorage.setItem(LOCAL_STORAGE_KEY_EXPENSES, JSON.stringify(expenses));
-  notifyLocalChange();
+  notifyLocalChange(STORE_UPDATE_EXPENSES);
 }
 
 /** Delete Expense */
@@ -448,5 +463,5 @@ export async function deleteExpense(eventId, expenseId) {
 
   const expenses = getLocalExpenses().filter(exp => exp.id !== expenseId);
   localStorage.setItem(LOCAL_STORAGE_KEY_EXPENSES, JSON.stringify(expenses));
-  notifyLocalChange();
+  notifyLocalChange(STORE_UPDATE_EXPENSES);
 }

@@ -38,11 +38,24 @@ export default function App() {
     const unsubscribe = subscribeToEvents((fetchedEvents) => {
       setEvents(fetchedEvents);
       if (fetchedEvents.length > 0) {
-        // Keep current selected event or default to first
+        // Keep current selected event object reference if data hasn't changed to prevent extra renders
         setCurrentEvent(prev => {
           if (!prev) return fetchedEvents[0];
           const match = fetchedEvents.find(e => e.id === prev.id);
-          return match || fetchedEvents[0];
+          if (!match) return fetchedEvents[0];
+
+          // If all fields are identical, preserve previous object reference to avoid re-renders
+          if (
+            prev.id === match.id &&
+            prev.name === match.name &&
+            prev.description === match.description &&
+            prev.budget === match.budget &&
+            prev.currency === match.currency
+          ) {
+            return prev;
+          }
+
+          return match;
         });
       } else {
         setCurrentEvent(null);
