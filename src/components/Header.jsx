@@ -3,11 +3,8 @@ import { createPortal } from 'react-dom';
 import {
   ChevronDown,
   Plus,
-  Calendar,
-  DollarSign,
   Sun,
   Moon,
-  Sparkles,
   Trash2,
   Edit3,
   X,
@@ -103,7 +100,7 @@ export const Header = React.memo(function Header({
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
             aria-expanded={isDropdownOpen}
             aria-haspopup="true"
-            className="flex items-center space-x-2 px-3 py-1.5 rounded-lg hover:bg-[#F7F6F3] dark:hover:bg-[#202020] transition-colors border border-transparent hover:border-[#E3E2E0] dark:hover:border-[#2F2F2F] group"
+            className="flex items-center space-x-2 px-3 py-1.5 rounded-lg hover:bg-[#F7F6F3] dark:hover:bg-[#202020] transition-colors border border-transparent hover:border-[#E3E2E0] dark:hover:border-[#2F2F2F] group focus-visible:ring-2 focus-visible:ring-black dark:focus-visible:ring-white focus:outline-none"
           >
             <div className="w-8 h-8 rounded-lg bg-black text-white dark:bg-white dark:text-black flex items-center justify-center font-semibold text-sm shadow-sm group-hover:scale-105 transition-transform">
               {currentEvent ? currentEvent.name.charAt(0).toUpperCase() : 'E'}
@@ -149,7 +146,7 @@ export const Header = React.memo(function Header({
               <div className="border-t border-[#E3E2E0] dark:border-[#2F2F2F] mt-1 pt-1 px-1">
                 <button
                   onClick={openNewModal}
-                  className="w-full text-left px-3 py-2 rounded-lg text-sm text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/30 flex items-center space-x-2 font-medium transition-colors"
+                  className="w-full text-left px-3 py-2 rounded-lg text-sm text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/30 flex items-center space-x-2 font-medium transition-colors focus-visible:ring-2 focus-visible:ring-blue-500 focus:outline-none"
                 >
                   <Plus className="w-4 h-4" />
                   <span>Create New Event</span>
@@ -168,7 +165,7 @@ export const Header = React.memo(function Header({
             <button
               onClick={openEditModal}
               aria-label="Edit event details"
-              className="p-1.5 hover:bg-[#F7F6F3] dark:hover:bg-[#202020] rounded-md transition-colors"
+              className="p-1.5 hover:bg-[#F7F6F3] dark:hover:bg-[#202020] rounded-md transition-colors focus-visible:ring-2 focus-visible:ring-black dark:focus-visible:ring-white focus:outline-none"
               title="Edit Event Details"
             >
               <Edit3 className="w-4 h-4" />
@@ -181,7 +178,7 @@ export const Header = React.memo(function Header({
                   }
                 }}
                 aria-label="Delete event"
-                className="p-1.5 hover:bg-red-50 text-red-500 dark:hover:bg-red-950/40 rounded-md transition-colors"
+                className="p-1.5 hover:bg-red-50 text-red-500 dark:hover:bg-red-950/40 rounded-md transition-colors focus-visible:ring-2 focus-visible:ring-red-500 focus:outline-none"
                 title="Delete Event"
               >
                 <Trash2 className="w-4 h-4" />
@@ -225,7 +222,7 @@ export const Header = React.memo(function Header({
           <div className="bg-white dark:bg-[#202020] border border-[#E3E2E0] dark:border-[#2F2F2F] rounded-2xl shadow-apple max-w-md w-full p-6 space-y-4 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between pb-2 border-b border-[#E3E2E0] dark:border-[#2F2F2F]">
               <h3 id="new-event-title" className="text-lg font-semibold text-[#37352F] dark:text-[#D4D4D4]">Create New Event</h3>
-              <button onClick={() => setIsNewEventModalOpen(false)} aria-label="Close modal" className="text-gray-400 hover:text-gray-600">
+              <button onClick={() => setIsNewEventModalOpen(false)} aria-label="Close modal" className="p-1 text-gray-400 hover:text-gray-600 rounded-lg focus-visible:ring-2 focus-visible:ring-black dark:focus-visible:ring-white focus:outline-none">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -315,7 +312,7 @@ export const Header = React.memo(function Header({
           <div className="bg-white dark:bg-[#202020] border border-[#E3E2E0] dark:border-[#2F2F2F] rounded-2xl shadow-apple max-w-md w-full p-6 space-y-4 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between pb-2 border-b border-[#E3E2E0] dark:border-[#2F2F2F]">
               <h3 id="edit-event-title" className="text-lg font-semibold text-[#37352F] dark:text-[#D4D4D4]">Edit Event</h3>
-              <button onClick={() => setIsEditEventModalOpen(false)} aria-label="Close modal" className="text-gray-400 hover:text-gray-600">
+              <button onClick={() => setIsEditEventModalOpen(false)} aria-label="Close modal" className="p-1 text-gray-400 hover:text-gray-600 rounded-lg focus-visible:ring-2 focus-visible:ring-black dark:focus-visible:ring-white focus:outline-none">
                 <X className="w-5 h-5" />
               </button>
             </div>

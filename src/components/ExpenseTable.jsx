@@ -9,14 +9,8 @@ import {
   Download,
   Edit2,
   Trash2,
-  Filter,
   X,
-  FolderPlus,
-  FileText,
-  DollarSign,
-  Calendar,
-  Building,
-  Tag
+  FolderPlus
 } from 'lucide-react';
 import { CategoryBadge, StatusBadge, formatCurrency } from './Badges';
 import { DEFAULT_CATEGORIES, STATUS_OPTIONS, subscribeToCategories, addCategory } from '../services/store';
@@ -291,7 +285,7 @@ export const ExpenseTable = React.memo(function ExpenseTable({
             className="w-full pl-9 pr-3 py-2 text-xs bg-white dark:bg-[#191919] border border-[#E3E2E0] dark:border-[#2F2F2F] rounded-xl focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition-all text-[#37352F] dark:text-[#D4D4D4]"
           />
           {searchQuery && (
-            <button onClick={() => setSearchQuery('')} aria-label="Clear search query" className="absolute right-2.5 top-2.5 text-gray-400 hover:text-gray-600">
+            <button onClick={() => setSearchQuery('')} aria-label="Clear search query" className="absolute right-2.5 top-2.5 text-gray-400 hover:text-gray-600 focus-visible:ring-2 focus-visible:ring-black dark:focus-visible:ring-white rounded focus:outline-none">
               <X className="w-3.5 h-3.5" />
             </button>
           )}
@@ -469,7 +463,7 @@ export const ExpenseTable = React.memo(function ExpenseTable({
                       <button
                         onClick={() => openEditModal(exp)}
                         aria-label={`Edit ${exp.title}`}
-                        className="p-1 hover:bg-gray-200 dark:hover:bg-[#2B2B2B] rounded text-gray-600 dark:text-gray-300 transition-colors"
+                        className="p-1 hover:bg-gray-200 dark:hover:bg-[#2B2B2B] rounded text-gray-600 dark:text-gray-300 transition-colors focus-visible:ring-2 focus-visible:ring-black dark:focus-visible:ring-white focus:outline-none"
                         title="Edit Expense"
                       >
                         <Edit2 className="w-3.5 h-3.5" />
@@ -481,7 +475,7 @@ export const ExpenseTable = React.memo(function ExpenseTable({
                           }
                         }}
                         aria-label={`Delete ${exp.title}`}
-                        className="p-1 hover:bg-red-100 dark:hover:bg-red-950/40 rounded text-red-500 transition-colors"
+                        className="p-1 hover:bg-red-100 dark:hover:bg-red-950/40 rounded text-red-500 transition-colors focus-visible:ring-2 focus-visible:ring-red-500 focus:outline-none"
                         title="Delete Expense"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -510,7 +504,7 @@ export const ExpenseTable = React.memo(function ExpenseTable({
                 <FolderPlus className="w-4 h-4" />
                 <span>Create New Category</span>
               </h3>
-              <button onClick={() => setIsCategoryModalOpen(false)} aria-label="Close modal" className="text-gray-400 hover:text-gray-600">
+              <button onClick={() => setIsCategoryModalOpen(false)} aria-label="Close modal" className="p-1 text-gray-400 hover:text-gray-600 rounded-lg focus-visible:ring-2 focus-visible:ring-black dark:focus-visible:ring-white focus:outline-none">
                 <X className="w-4 h-4" />
               </button>
             </div>
@@ -579,7 +573,7 @@ export const ExpenseTable = React.memo(function ExpenseTable({
               <h3 id="expense-modal-title" className="text-lg font-semibold text-[#37352F] dark:text-[#D4D4D4]">
                 {editingExpense ? 'Edit Expense Item' : 'New Expense Item'}
               </h3>
-              <button onClick={() => setIsModalOpen(false)} aria-label="Close modal" className="text-gray-400 hover:text-gray-600">
+              <button onClick={() => setIsModalOpen(false)} aria-label="Close modal" className="p-1 text-gray-400 hover:text-gray-600 rounded-lg focus-visible:ring-2 focus-visible:ring-black dark:focus-visible:ring-white focus:outline-none">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -606,7 +600,7 @@ export const ExpenseTable = React.memo(function ExpenseTable({
                     <button
                       type="button"
                       onClick={() => setIsCategoryModalOpen(true)}
-                      className="text-[11px] text-blue-600 dark:text-blue-400 hover:underline flex items-center space-x-1"
+                      className="text-[11px] text-blue-600 dark:text-blue-400 hover:underline flex items-center space-x-1 focus-visible:ring-2 focus-visible:ring-blue-500 rounded px-1 focus:outline-none"
                     >
                       <Plus className="w-3 h-3" />
                       <span>New</span>
