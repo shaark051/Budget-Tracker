@@ -9,3 +9,7 @@
 ## 2026-09-20 - Avoiding Redundant Native Storage Event Dispatches
 **Learning:** In local store subscriptions listening to both custom store update events and native `'storage'` events, manually dispatching `new Event('storage')` alongside custom events causes duplicate event triggers, duplicate `localStorage` reads/JSON parsing, and duplicate React state updates/renders on every mutation. Native browser `'storage'` events are already automatically dispatched to other tabs.
 **Action:** Only dispatch custom store update events for intra-tab updates and rely on native browser `'storage'` events for inter-tab sync.
+
+## 2026-09-21 - Table Row Memoization & Allocation-Free Direct Sorting
+**Learning:** Rendering complex table rows inline causes every modal state change or keystroke in form inputs to re-evaluate and re-render all table rows in the list. Extracting rows into a `React.memo` component (`ExpenseRow`) with stable `useCallback` handlers allows React to completely skip unchanged row subtrees. Furthermore, sorting directly via comparators avoids allocating intermediate `{ exp, key }` wrapper objects and extra array mappings on every sort or filter execution.
+**Action:** Extract list item rows into `React.memo` components with stable callbacks, and use direct comparator sorting to eliminate temporary object wrapper allocations during list filter/sort passes.

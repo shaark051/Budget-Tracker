@@ -29,9 +29,11 @@ All notable changes and architectural overview for the **@shaarky Event Budget &
   - Optimized `currentEvent` state retention in `src/App.jsx` to preserve existing object references when matched event properties (`id`, `name`, `description`, `budget`, `currency`) are unchanged, preventing cascading React component re-renders across header navigation and analytics components.
 - **Header memoization & callback stabilization**:
   - Wrapped `Header` in `React.memo` and stabilized `handleAddEvent` in `App.jsx` using `useCallback` to prevent redundant re-renders of the header navigation, modal dialogs, and event switcher dropdown whenever expense items or loading states update in `App`.
+- **ExpenseRow memoization & allocation-free direct sorting**:
+  - Extracted expense table list item rows into a `React.memo` component (`ExpenseRow`) with stable `useCallback` action handlers (`handleEditExpense`, `handleDeleteExpense`), preventing re-rendering all table rows when typing in form inputs or toggling modal state in `ExpenseTable`.
+  - Refactored `filteredAndSortedExpenses` `useMemo` comparator to sort directly instead of creating intermediate `mapped` arrays with temporary `{ exp, key }` object wrappers, eliminating unnecessary heap allocations on sort/filter passes.
 - **ExpenseTable memoization & search/sorting key optimization**:
   - Wrapped `ExpenseTable` in `React.memo` to skip redundant re-renders when parent components update state that does not affect table props (e.g. dark mode toggling).
-  - Pre-computed sort keys once per item in `useMemo` before sorting, eliminating $O(N \log N)$ redundant string lowercasing and float parsing conversions inside JavaScript's sort comparator.
   - Hoisted `searchQuery` lowercasing outside the `.filter()` loop in `useMemo` to run query normalization once per filter pass instead of up to $3N$ times.
   - Added short-circuit logic (`!query`) to bypass string lowercasing and substring matching for all items when the search input is empty.
 - **Category labels Set hoisting**:
