@@ -9,3 +9,7 @@
 ## 2026-09-20 - Avoiding Redundant Native Storage Event Dispatches
 **Learning:** In local store subscriptions listening to both custom store update events and native `'storage'` events, manually dispatching `new Event('storage')` alongside custom events causes duplicate event triggers, duplicate `localStorage` reads/JSON parsing, and duplicate React state updates/renders on every mutation. Native browser `'storage'` events are already automatically dispatched to other tabs.
 **Action:** Only dispatch custom store update events for intra-tab updates and rely on native browser `'storage'` events for inter-tab sync.
+
+## 2026-09-21 - Isolating Modal Form State from Table Grid Renders
+**Learning:** Managing modal form input state at the top level of a list component (like `ExpenseTable`) causes every single keystroke in form inputs to re-render the entire table, headers, filters, and all table row elements. Extracting modal form state into self-contained `React.memo` modal components completely isolates table grid re-renders while typing.
+**Action:** Always encapsulate modal form input state inside dedicated modal components rather than hosting input state in parent table/list components.

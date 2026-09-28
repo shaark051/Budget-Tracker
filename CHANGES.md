@@ -23,17 +23,20 @@ All notable changes and architectural overview for the **@shaarky Event Budget &
   - Added distinct `focus-visible` ring/outline indicators (`focus-visible:ring-2 focus-visible:ring-offset-2`) to category tag color selection buttons in the "Create New Category" modal for improved keyboard accessibility.
 
 ### Performance
+- **Modal Form State Isolation**:
+  - Isolated form input states inside dedicated `ExpenseModal` and `CategoryModal` components (`React.memo`) to eliminate top-level `ExpenseTable` re-renders and table row DOM updates while typing in form fields.
+  - Safely controlled form initialization using refs (`prevIsOpenRef`, `prevEditingRef`) so store category updates do not reset form inputs while editing.
+  - Connected `onCategoryCreated` callback to auto-select newly created categories in `ExpenseModal`.
+- **Expense Table Row Memoization**:
+  - Extracted individual row rendering into a memoized `ExpenseRow` component (`React.memo`) to prevent re-rendering unmodified table rows when search queries, filters, or sorting options change.
+- **Optimized Array Sorting**:
+  - Streamlined `filteredAndSortedExpenses` sorting logic in `useMemo` by replacing intermediate wrapper object allocations (`{ exp, key }`) with direct comparator functions, eliminating temporary wrapper array creations during sort passes.
 - **Fine-grained store subscription events & storage key filtering**:
   - Replaced generic global store update events with fine-grained custom events (`app_events_updated`, `app_expenses_updated`, `app_categories_updated`) in `src/services/store.js`. Modifying expenses or categories now only triggers listeners for that specific entity type rather than re-evaluating all subscribers across the entire application.
   - Added `e.key` filtering to cross-tab `storage` event listeners so local storage updates in one entity type skip re-reads and re-evaluations in unrelated stores.
   - Optimized `currentEvent` state retention in `src/App.jsx` to preserve existing object references when matched event properties (`id`, `name`, `description`, `budget`, `currency`) are unchanged, preventing cascading React component re-renders across header navigation and analytics components.
 - **Header memoization & callback stabilization**:
   - Wrapped `Header` in `React.memo` and stabilized `handleAddEvent` in `App.jsx` using `useCallback` to prevent redundant re-renders of the header navigation, modal dialogs, and event switcher dropdown whenever expense items or loading states update in `App`.
-- **ExpenseTable memoization & search/sorting key optimization**:
-  - Wrapped `ExpenseTable` in `React.memo` to skip redundant re-renders when parent components update state that does not affect table props (e.g. dark mode toggling).
-  - Pre-computed sort keys once per item in `useMemo` before sorting, eliminating $O(N \log N)$ redundant string lowercasing and float parsing conversions inside JavaScript's sort comparator.
-  - Hoisted `searchQuery` lowercasing outside the `.filter()` loop in `useMemo` to run query normalization once per filter pass instead of up to $3N$ times.
-  - Added short-circuit logic (`!query`) to bypass string lowercasing and substring matching for all items when the search input is empty.
 - **Category labels Set hoisting**:
   - Hoisted `DEFAULT_CATEGORY_LABELS_SET` to module scope in `src/services/store.js` to avoid re-allocating a `Set` on every category snapshot subscription event.
 - **Analytics calculations & Badge memoization**:
