@@ -516,8 +516,11 @@ export const ExpenseTable = React.memo(function ExpenseTable({
             </div>
             <form onSubmit={handleCreateCategory} className="space-y-3">
               <div>
-                <label className="block text-xs font-medium text-gray-500 mb-1">Category Name</label>
+                <label htmlFor="new-category-name" className="block text-xs font-medium text-gray-500 mb-1">
+                  Category Name <span className="text-red-500">*</span>
+                </label>
                 <input
+                  id="new-category-name"
                   type="text"
                   required
                   autoFocus
@@ -586,7 +589,9 @@ export const ExpenseTable = React.memo(function ExpenseTable({
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label htmlFor="expense-title" className="block text-xs font-medium text-gray-500 mb-1">Title / Item</label>
+                <label htmlFor="expense-title" className="block text-xs font-medium text-gray-500 mb-1">
+                  Title / Item <span className="text-red-500">*</span>
+                </label>
                 <input
                   id="expense-title"
                   type="text"
@@ -624,7 +629,9 @@ export const ExpenseTable = React.memo(function ExpenseTable({
                   </select>
                 </div>
                 <div>
-                  <label htmlFor="expense-amount" className="block text-xs font-medium text-gray-500 mb-1">Amount ({currency})</label>
+                  <label htmlFor="expense-amount" className="block text-xs font-medium text-gray-500 mb-1">
+                    Amount ({currency}) <span className="text-red-500">*</span>
+                  </label>
                   <input
                     id="expense-amount"
                     type="number"
