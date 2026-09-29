@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import {
   Search,
@@ -20,6 +20,73 @@ import {
 } from 'lucide-react';
 import { CategoryBadge, StatusBadge, formatCurrency } from './Badges';
 import { DEFAULT_CATEGORIES, STATUS_OPTIONS, subscribeToCategories, addCategory } from '../services/store';
+
+// Memoized row component prevents re-rendering all table rows when parent modal states or search inputs update
+const ExpenseRow = React.memo(function ExpenseRow({ exp, currency, onEdit, onDelete }) {
+  const tot = parseFloat(exp.amount) || 0;
+  const adv = Math.min(tot, Math.max(0, parseFloat(exp.advanceAmount) || 0));
+  const rem = Math.max(0, tot - adv);
+
+  return (
+    <tr className="hover:bg-[#F7F6F3] dark:hover:bg-[#202020] transition-colors group">
+      <td className="py-3 px-4 font-medium text-[#37352F] dark:text-[#D4D4D4]">
+        <div>{exp.title}</div>
+        {exp.notes && (
+          <div className="text-[11px] text-gray-400 font-normal truncate max-w-xs mt-0.5">
+            {exp.notes}
+          </div>
+        )}
+      </td>
+      <td className="py-3 px-4 whitespace-nowrap">
+        <CategoryBadge category={exp.category} />
+      </td>
+      <td className="py-3 px-4 font-mono text-[#37352F] dark:text-[#D4D4D4] whitespace-nowrap">
+        <div className="font-semibold">{formatCurrency(exp.amount, currency)}</div>
+        {adv > 0 && (
+          <div className="text-[10px] text-gray-500 font-normal space-y-0.5">
+            <span className="text-emerald-600 dark:text-emerald-400">
+              Advance: {formatCurrency(adv, currency)}
+            </span>
+            {rem > 0 && (
+              <span className="ml-1 text-amber-600 dark:text-amber-400">
+                | Due: {formatCurrency(rem, currency)}
+              </span>
+            )}
+          </div>
+        )}
+      </td>
+      <td className="py-3 px-4 whitespace-nowrap">
+        <StatusBadge status={exp.status} />
+      </td>
+      <td className="py-3 px-4 text-gray-500 dark:text-gray-400 font-mono text-[11px] whitespace-nowrap">
+        {exp.date}
+      </td>
+      <td className="py-3 px-4 text-gray-500 dark:text-gray-400 hidden md:table-cell whitespace-nowrap">
+        {exp.vendor || '-'}
+      </td>
+      <td className="py-3 px-4 text-right whitespace-nowrap">
+        <div className="flex items-center justify-end space-x-1 opacity-80 group-hover:opacity-100 transition-opacity">
+          <button
+            onClick={() => onEdit(exp)}
+            aria-label={`Edit ${exp.title}`}
+            className="p-1 hover:bg-gray-200 dark:hover:bg-[#2B2B2B] rounded text-gray-600 dark:text-gray-300 transition-colors"
+            title="Edit Expense"
+          >
+            <Edit2 className="w-3.5 h-3.5" />
+          </button>
+          <button
+            onClick={() => onDelete(exp)}
+            aria-label={`Delete ${exp.title}`}
+            className="p-1 hover:bg-red-100 dark:hover:bg-red-950/40 rounded text-red-500 transition-colors"
+            title="Delete Expense"
+          >
+            <Trash2 className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      </td>
+    </tr>
+  );
+});
 
 // Memoized component prevents re-rendering table grid on parent state changes (e.g., dark mode toggle)
 export const ExpenseTable = React.memo(function ExpenseTable({
@@ -114,7 +181,7 @@ export const ExpenseTable = React.memo(function ExpenseTable({
     setIsModalOpen(true);
   };
 
-  const openEditModal = (expense) => {
+  const openEditModal = useCallback((expense) => {
     setEditingExpense(expense);
     setTitle(expense.title || '');
     setCategory(expense.category || DEFAULT_CATEGORIES[0].label);
@@ -125,7 +192,13 @@ export const ExpenseTable = React.memo(function ExpenseTable({
     setVendor(expense.vendor || '');
     setNotes(expense.notes || '');
     setIsModalOpen(true);
-  };
+  }, []);
+
+  const handleDeleteExpense = useCallback((expense) => {
+    if (confirm(`Delete "${expense.title}"?`)) {
+      onDeleteExpense(currentEvent.id, expense.id);
+    }
+  }, [currentEvent?.id, onDeleteExpense]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -154,8 +227,8 @@ export const ExpenseTable = React.memo(function ExpenseTable({
     setIsModalOpen(false);
   };
 
-  // Sort & Filter logic with pre-computed sort keys and single query normalization.
-  // Pre-computing sort key values once per item avoids O(N log N) redundant string lowercasing/parsing calls in .sort().
+  // Optimized sort & filter logic: sorts directly on the filtered array in place,
+  // avoiding intermediate mapped array/object allocations ({ exp, key }) and redundant conversions for ISO dates and numbers.
   const filteredAndSortedExpenses = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
 
@@ -175,23 +248,25 @@ export const ExpenseTable = React.memo(function ExpenseTable({
       );
     });
 
-    const isNumericSort = sortField === 'amount';
     const isAsc = sortDirection === 'asc';
 
-    // Map to objects with pre-computed key value to eliminate repeated conversion inside comparator loop
-    const mapped = filtered.map((exp) => {
-      const raw = exp[sortField];
-      const key = isNumericSort ? (parseFloat(raw) || 0) : String(raw || '').toLowerCase();
-      return { exp, key };
-    });
+    return filtered.sort((a, b) => {
+      let cmp = 0;
+      if (sortField === 'amount') {
+        cmp = (parseFloat(a.amount) || 0) - (parseFloat(b.amount) || 0);
+      } else if (sortField === 'date') {
+        // ISO dates ("YYYY-MM-DD") can be directly compared as strings without lowercasing
+        const rawA = a.date || '';
+        const rawB = b.date || '';
+        cmp = rawA < rawB ? -1 : rawA > rawB ? 1 : 0;
+      } else {
+        const rawA = String(a[sortField] || '').toLowerCase();
+        const rawB = String(b[sortField] || '').toLowerCase();
+        cmp = rawA < rawB ? -1 : rawA > rawB ? 1 : 0;
+      }
 
-    mapped.sort((a, b) => {
-      if (a.key < b.key) return isAsc ? -1 : 1;
-      if (a.key > b.key) return isAsc ? 1 : -1;
-      return 0;
+      return isAsc ? cmp : -cmp;
     });
-
-    return mapped.map(item => item.exp);
   }, [expenses, searchQuery, selectedCategory, selectedStatus, sortField, sortDirection]);
 
   const toggleSort = (field) => {
@@ -417,78 +492,13 @@ export const ExpenseTable = React.memo(function ExpenseTable({
               </tr>
             ) : (
               filteredAndSortedExpenses.map((exp) => (
-                <tr
+                <ExpenseRow
                   key={exp.id}
-                  className="hover:bg-[#F7F6F3] dark:hover:bg-[#202020] transition-colors group"
-                >
-                  <td className="py-3 px-4 font-medium text-[#37352F] dark:text-[#D4D4D4]">
-                    <div>{exp.title}</div>
-                    {exp.notes && (
-                      <div className="text-[11px] text-gray-400 font-normal truncate max-w-xs mt-0.5">
-                        {exp.notes}
-                      </div>
-                    )}
-                  </td>
-                  <td className="py-3 px-4 whitespace-nowrap">
-                    <CategoryBadge category={exp.category} />
-                  </td>
-              <td className="py-3 px-4 font-mono text-[#37352F] dark:text-[#D4D4D4] whitespace-nowrap">
-                <div className="font-semibold">{formatCurrency(exp.amount, currency)}</div>
-                {(() => {
-                  const tot = parseFloat(exp.amount) || 0;
-                  const adv = Math.min(tot, Math.max(0, parseFloat(exp.advanceAmount) || 0));
-                  const rem = Math.max(0, tot - adv);
-                  if (adv > 0) {
-                    return (
-                      <div className="text-[10px] text-gray-500 font-normal space-y-0.5">
-                        <span className="text-emerald-600 dark:text-emerald-400">
-                          Advance: {formatCurrency(adv, currency)}
-                        </span>
-                        {rem > 0 && (
-                          <span className="ml-1 text-amber-600 dark:text-amber-400">
-                            | Due: {formatCurrency(rem, currency)}
-                          </span>
-                        )}
-                      </div>
-                    );
-                  }
-                  return null;
-                })()}
-                  </td>
-                  <td className="py-3 px-4 whitespace-nowrap">
-                    <StatusBadge status={exp.status} />
-                  </td>
-                  <td className="py-3 px-4 text-gray-500 dark:text-gray-400 font-mono text-[11px] whitespace-nowrap">
-                    {exp.date}
-                  </td>
-                  <td className="py-3 px-4 text-gray-500 dark:text-gray-400 hidden md:table-cell whitespace-nowrap">
-                    {exp.vendor || '-'}
-                  </td>
-                  <td className="py-3 px-4 text-right whitespace-nowrap">
-                    <div className="flex items-center justify-end space-x-1 opacity-80 group-hover:opacity-100 transition-opacity">
-                      <button
-                        onClick={() => openEditModal(exp)}
-                        aria-label={`Edit ${exp.title}`}
-                        className="p-1 hover:bg-gray-200 dark:hover:bg-[#2B2B2B] rounded text-gray-600 dark:text-gray-300 transition-colors"
-                        title="Edit Expense"
-                      >
-                        <Edit2 className="w-3.5 h-3.5" />
-                      </button>
-                      <button
-                        onClick={() => {
-                          if (confirm(`Delete "${exp.title}"?`)) {
-                            onDeleteExpense(currentEvent.id, exp.id);
-                          }
-                        }}
-                        aria-label={`Delete ${exp.title}`}
-                        className="p-1 hover:bg-red-100 dark:hover:bg-red-950/40 rounded text-red-500 transition-colors"
-                        title="Delete Expense"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
+                  exp={exp}
+                  currency={currency}
+                  onEdit={openEditModal}
+                  onDelete={handleDeleteExpense}
+                />
               ))
             )}
           </tbody>
