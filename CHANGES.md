@@ -15,6 +15,9 @@ All notable changes and architectural overview for the **@shaarky Event Budget &
   - Updated `AnalyticsSummary` card stats to calculate and present total "Advance Paid" and "Remaining Due" across all vendor expenses in real-time.
 
 ### Accessibility & Micro-UX
+- **Modal Form Label Associations & Color Swatch Grouping**:
+  - Explicitly connected form `<label>` elements to corresponding `<input>` and `<select>` controls using matching `htmlFor` and `id` attributes across `Header.jsx` (New & Edit Event modals) and `ExpenseTable.jsx` (Create New Category modal).
+  - Added `role="group"` and `aria-labelledby="tag-color-label"` to the category color picker container in `ExpenseTable.jsx` to improve context for screen reader users.
 - **Modal Dialog Keyboard & Backdrop Navigation**:
   - Added `Escape` key keyboard listeners to close active modals (`New Event`, `Edit Event`, `New Expense`, `New Category`) and dropdowns.
   - Added backdrop overlay click-to-dismiss behavior for all modal dialogs.

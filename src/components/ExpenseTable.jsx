@@ -516,8 +516,9 @@ export const ExpenseTable = React.memo(function ExpenseTable({
             </div>
             <form onSubmit={handleCreateCategory} className="space-y-3">
               <div>
-                <label className="block text-xs font-medium text-gray-500 mb-1">Category Name</label>
+                <label htmlFor="new-category-name" className="block text-xs font-medium text-gray-500 mb-1">Category Name</label>
                 <input
+                  id="new-category-name"
                   type="text"
                   required
                   autoFocus
@@ -528,8 +529,8 @@ export const ExpenseTable = React.memo(function ExpenseTable({
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-gray-500 mb-1.5">Tag Color</label>
-                <div className="flex items-center gap-2 flex-wrap">
+                <label id="tag-color-label" className="block text-xs font-medium text-gray-500 mb-1.5">Tag Color</label>
+                <div role="group" aria-labelledby="tag-color-label" className="flex items-center gap-2 flex-wrap">
                   {COLOR_OPTIONS.map((c) => (
                     <button
                       key={c.id}
