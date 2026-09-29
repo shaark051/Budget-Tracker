@@ -231,8 +231,9 @@ export const Header = React.memo(function Header({
             </div>
             <form onSubmit={handleCreateEvent} className="space-y-4">
               <div>
-                <label className="block text-xs font-medium text-gray-500 mb-1">Event Name</label>
+                <label htmlFor="new-event-name" className="block text-xs font-medium text-gray-500 mb-1">Event Name</label>
                 <input
+                  id="new-event-name"
                   type="text"
                   required
                   autoFocus
@@ -243,8 +244,9 @@ export const Header = React.memo(function Header({
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-gray-500 mb-1">Description</label>
+                <label htmlFor="new-event-description" className="block text-xs font-medium text-gray-500 mb-1">Description</label>
                 <input
+                  id="new-event-description"
                   type="text"
                   placeholder="e.g. Keynote, networking dinner and workshops"
                   value={description}
@@ -254,8 +256,9 @@ export const Header = React.memo(function Header({
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-medium text-gray-500 mb-1">Total Budget</label>
+                  <label htmlFor="new-event-budget" className="block text-xs font-medium text-gray-500 mb-1">Total Budget</label>
                   <input
+                    id="new-event-budget"
                     type="number"
                     required
                     min="0"
@@ -266,8 +269,9 @@ export const Header = React.memo(function Header({
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-gray-500 mb-1">Currency</label>
+                  <label htmlFor="new-event-currency" className="block text-xs font-medium text-gray-500 mb-1">Currency</label>
                   <select
+                    id="new-event-currency"
                     value={currency}
                     onChange={(e) => setCurrency(e.target.value)}
                     className="w-full px-3 py-2 bg-[#F7F6F3] dark:bg-[#191919] border border-[#E3E2E0] dark:border-[#2F2F2F] rounded-lg focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white text-sm"
@@ -321,8 +325,9 @@ export const Header = React.memo(function Header({
             </div>
             <form onSubmit={handleSaveEditEvent} className="space-y-4">
               <div>
-                <label className="block text-xs font-medium text-gray-500 mb-1">Event Name</label>
+                <label htmlFor="edit-event-name" className="block text-xs font-medium text-gray-500 mb-1">Event Name</label>
                 <input
+                  id="edit-event-name"
                   type="text"
                   required
                   autoFocus
@@ -332,8 +337,9 @@ export const Header = React.memo(function Header({
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-gray-500 mb-1">Description</label>
+                <label htmlFor="edit-event-description" className="block text-xs font-medium text-gray-500 mb-1">Description</label>
                 <input
+                  id="edit-event-description"
                   type="text"
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
@@ -342,8 +348,9 @@ export const Header = React.memo(function Header({
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-medium text-gray-500 mb-1">Total Budget</label>
+                  <label htmlFor="edit-event-budget" className="block text-xs font-medium text-gray-500 mb-1">Total Budget</label>
                   <input
+                    id="edit-event-budget"
                     type="number"
                     required
                     min="0"
@@ -354,8 +361,9 @@ export const Header = React.memo(function Header({
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-gray-500 mb-1">Currency</label>
+                  <label htmlFor="edit-event-currency" className="block text-xs font-medium text-gray-500 mb-1">Currency</label>
                   <select
+                    id="edit-event-currency"
                     value={currency}
                     onChange={(e) => setCurrency(e.target.value)}
                     className="w-full px-3 py-2 bg-[#F7F6F3] dark:bg-[#191919] border border-[#E3E2E0] dark:border-[#2F2F2F] rounded-lg focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white text-sm"
