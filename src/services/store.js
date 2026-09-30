@@ -332,6 +332,7 @@ export function subscribeToExpenses(eventId, callback) {
     window.addEventListener('storage', handleStorage);
     window.addEventListener(STORE_UPDATE_EXPENSES, handleStorage);
     return () => {
+      // Unbind storage and fine-grained custom event listener to prevent memory leaks and duplicate updates
       window.removeEventListener('storage', handleStorage);
       window.removeEventListener(STORE_UPDATE_EXPENSES, handleStorage);
     };
