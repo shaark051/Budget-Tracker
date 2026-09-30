@@ -103,7 +103,7 @@ export const Header = React.memo(function Header({
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
             aria-expanded={isDropdownOpen}
             aria-haspopup="true"
-            className="flex items-center space-x-2 px-3 py-1.5 rounded-lg hover:bg-[#F7F6F3] dark:hover:bg-[#202020] transition-colors border border-transparent hover:border-[#E3E2E0] dark:hover:border-[#2F2F2F] group"
+            className="flex items-center space-x-2 px-3 py-1.5 rounded-lg hover:bg-[#F7F6F3] dark:hover:bg-[#202020] transition-colors border border-transparent hover:border-[#E3E2E0] dark:hover:border-[#2F2F2F] focus-visible:ring-2 focus-visible:ring-black dark:focus-visible:ring-white focus:outline-none group"
           >
             <div className="w-8 h-8 rounded-lg bg-black text-white dark:bg-white dark:text-black flex items-center justify-center font-semibold text-sm shadow-sm group-hover:scale-105 transition-transform">
               {currentEvent ? currentEvent.name.charAt(0).toUpperCase() : 'E'}
@@ -168,7 +168,7 @@ export const Header = React.memo(function Header({
             <button
               onClick={openEditModal}
               aria-label="Edit event details"
-              className="p-1.5 hover:bg-[#F7F6F3] dark:hover:bg-[#202020] rounded-md transition-colors"
+              className="p-1.5 hover:bg-[#F7F6F3] dark:hover:bg-[#202020] rounded-md transition-colors focus-visible:ring-2 focus-visible:ring-black dark:focus-visible:ring-white focus:outline-none"
               title="Edit Event Details"
             >
               <Edit3 className="w-4 h-4" />
@@ -181,7 +181,7 @@ export const Header = React.memo(function Header({
                   }
                 }}
                 aria-label="Delete event"
-                className="p-1.5 hover:bg-red-50 text-red-500 dark:hover:bg-red-950/40 rounded-md transition-colors"
+                className="p-1.5 hover:bg-red-50 text-red-500 dark:hover:bg-red-950/40 rounded-md transition-colors focus-visible:ring-2 focus-visible:ring-red-500 focus:outline-none"
                 title="Delete Event"
               >
                 <Trash2 className="w-4 h-4" />
@@ -231,8 +231,9 @@ export const Header = React.memo(function Header({
             </div>
             <form onSubmit={handleCreateEvent} className="space-y-4">
               <div>
-                <label className="block text-xs font-medium text-gray-500 mb-1">Event Name</label>
+                <label htmlFor="new-event-name" className="block text-xs font-medium text-gray-500 mb-1">Event Name</label>
                 <input
+                  id="new-event-name"
                   type="text"
                   required
                   autoFocus
@@ -243,8 +244,9 @@ export const Header = React.memo(function Header({
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-gray-500 mb-1">Description</label>
+                <label htmlFor="new-event-description" className="block text-xs font-medium text-gray-500 mb-1">Description</label>
                 <input
+                  id="new-event-description"
                   type="text"
                   placeholder="e.g. Keynote, networking dinner and workshops"
                   value={description}
@@ -254,8 +256,9 @@ export const Header = React.memo(function Header({
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-medium text-gray-500 mb-1">Total Budget</label>
+                  <label htmlFor="new-event-budget" className="block text-xs font-medium text-gray-500 mb-1">Total Budget</label>
                   <input
+                    id="new-event-budget"
                     type="number"
                     required
                     min="0"
@@ -266,8 +269,9 @@ export const Header = React.memo(function Header({
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-gray-500 mb-1">Currency</label>
+                  <label htmlFor="new-event-currency" className="block text-xs font-medium text-gray-500 mb-1">Currency</label>
                   <select
+                    id="new-event-currency"
                     value={currency}
                     onChange={(e) => setCurrency(e.target.value)}
                     className="w-full px-3 py-2 bg-[#F7F6F3] dark:bg-[#191919] border border-[#E3E2E0] dark:border-[#2F2F2F] rounded-lg focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white text-sm"
@@ -321,8 +325,9 @@ export const Header = React.memo(function Header({
             </div>
             <form onSubmit={handleSaveEditEvent} className="space-y-4">
               <div>
-                <label className="block text-xs font-medium text-gray-500 mb-1">Event Name</label>
+                <label htmlFor="edit-event-name" className="block text-xs font-medium text-gray-500 mb-1">Event Name</label>
                 <input
+                  id="edit-event-name"
                   type="text"
                   required
                   autoFocus
@@ -332,8 +337,9 @@ export const Header = React.memo(function Header({
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-gray-500 mb-1">Description</label>
+                <label htmlFor="edit-event-description" className="block text-xs font-medium text-gray-500 mb-1">Description</label>
                 <input
+                  id="edit-event-description"
                   type="text"
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
@@ -342,8 +348,9 @@ export const Header = React.memo(function Header({
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-medium text-gray-500 mb-1">Total Budget</label>
+                  <label htmlFor="edit-event-budget" className="block text-xs font-medium text-gray-500 mb-1">Total Budget</label>
                   <input
+                    id="edit-event-budget"
                     type="number"
                     required
                     min="0"
@@ -354,8 +361,9 @@ export const Header = React.memo(function Header({
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-gray-500 mb-1">Currency</label>
+                  <label htmlFor="edit-event-currency" className="block text-xs font-medium text-gray-500 mb-1">Currency</label>
                   <select
+                    id="edit-event-currency"
                     value={currency}
                     onChange={(e) => setCurrency(e.target.value)}
                     className="w-full px-3 py-2 bg-[#F7F6F3] dark:bg-[#191919] border border-[#E3E2E0] dark:border-[#2F2F2F] rounded-lg focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white text-sm"
