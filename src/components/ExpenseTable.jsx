@@ -516,8 +516,9 @@ export const ExpenseTable = React.memo(function ExpenseTable({
             </div>
             <form onSubmit={handleCreateCategory} className="space-y-3">
               <div>
-                <label className="block text-xs font-medium text-gray-500 mb-1">Category Name</label>
+                <label htmlFor="new-category-label" className="block text-xs font-medium text-gray-500 mb-1">Category Name</label>
                 <input
+                  id="new-category-label"
                   type="text"
                   required
                   autoFocus
