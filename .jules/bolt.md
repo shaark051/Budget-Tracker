@@ -9,3 +9,7 @@
 ## 2026-09-20 - Avoiding Redundant Native Storage Event Dispatches
 **Learning:** In local store subscriptions listening to both custom store update events and native `'storage'` events, manually dispatching `new Event('storage')` alongside custom events causes duplicate event triggers, duplicate `localStorage` reads/JSON parsing, and duplicate React state updates/renders on every mutation. Native browser `'storage'` events are already automatically dispatched to other tabs.
 **Action:** Only dispatch custom store update events for intra-tab updates and rely on native browser `'storage'` events for inter-tab sync.
+
+## 2026-09-21 - Matching Unsubscribe Event Names in Store Listeners
+**Learning:** `subscribeToExpenses` added a custom event listener using the constant `STORE_UPDATE_EXPENSES` (`'app_expenses_updated'`), but its cleanup function attempted to remove it using a string literal `'STORE_UPDATE_EXPENSES'`. Because the event string names mismatched, `removeEventListener` failed silently, leaving orphaned event handlers attached to `window` on every event selection change.
+**Action:** When removing custom window event listeners in store subscription cleanups, ensure the variable name referencing the event string is passed without quotes.
