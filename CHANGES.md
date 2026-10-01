@@ -31,6 +31,8 @@ All notable changes and architectural overview for the **@shaarky Event Budget &
   - Wrapped `Header` in `React.memo` and stabilized `handleAddEvent` in `App.jsx` using `useCallback` to prevent redundant re-renders of the header navigation, modal dialogs, and event switcher dropdown whenever expense items or loading states update in `App`.
 - **ExpenseTable memoization & search/sorting key optimization**:
   - Wrapped `ExpenseTable` in `React.memo` to skip redundant re-renders when parent components update state that does not affect table props (e.g. dark mode toggling).
+  - Extracted inline table row elements into a memoized `ExpenseRow` sub-component (`React.memo`) and stabilized action callbacks (`handleEdit`, `handleDelete`) with `useCallback`. Prevents re-rendering all table rows when typing in form modals or search filters, cutting table row DOM updates from $N$ to $0$.
+  - Single-pass filtering, search query matching, and sort-key generation in `useMemo`, eliminating intermediate array allocations per filter/sort pass.
   - Pre-computed sort keys once per item in `useMemo` before sorting, eliminating $O(N \log N)$ redundant string lowercasing and float parsing conversions inside JavaScript's sort comparator.
   - Hoisted `searchQuery` lowercasing outside the `.filter()` loop in `useMemo` to run query normalization once per filter pass instead of up to $3N$ times.
   - Added short-circuit logic (`!query`) to bypass string lowercasing and substring matching for all items when the search input is empty.

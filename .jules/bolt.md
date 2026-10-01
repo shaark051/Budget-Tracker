@@ -9,3 +9,7 @@
 ## 2026-09-20 - Avoiding Redundant Native Storage Event Dispatches
 **Learning:** In local store subscriptions listening to both custom store update events and native `'storage'` events, manually dispatching `new Event('storage')` alongside custom events causes duplicate event triggers, duplicate `localStorage` reads/JSON parsing, and duplicate React state updates/renders on every mutation. Native browser `'storage'` events are already automatically dispatched to other tabs.
 **Action:** Only dispatch custom store update events for intra-tab updates and rely on native browser `'storage'` events for inter-tab sync.
+
+## 2026-09-21 - Table Row Memoization with Callback Stabilization
+**Learning:** In table/list views co-located with active form modals or search filters, every keystroke in input fields triggers parent state re-renders. Extracting list items to `React.memo` components with `useCallback`-stabilized event handlers prevents re-rendering all unchanged rows, reducing row DOM updates from N to 0 during form typing.
+**Action:** Always extract list rows to `React.memo` components with stable handler references when list tables share state with active input forms.
