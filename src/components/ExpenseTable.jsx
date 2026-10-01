@@ -469,7 +469,7 @@ export const ExpenseTable = React.memo(function ExpenseTable({
                       <button
                         onClick={() => openEditModal(exp)}
                         aria-label={`Edit ${exp.title}`}
-                        className="p-1 hover:bg-gray-200 dark:hover:bg-[#2B2B2B] rounded text-gray-600 dark:text-gray-300 transition-colors"
+                        className="p-1 hover:bg-gray-200 dark:hover:bg-[#2B2B2B] rounded text-gray-600 dark:text-gray-300 transition-colors focus-visible:ring-2 focus-visible:ring-black dark:focus-visible:ring-white focus:outline-none"
                         title="Edit Expense"
                       >
                         <Edit2 className="w-3.5 h-3.5" />
@@ -481,7 +481,7 @@ export const ExpenseTable = React.memo(function ExpenseTable({
                           }
                         }}
                         aria-label={`Delete ${exp.title}`}
-                        className="p-1 hover:bg-red-100 dark:hover:bg-red-950/40 rounded text-red-500 transition-colors"
+                        className="p-1 hover:bg-red-100 dark:hover:bg-red-950/40 rounded text-red-500 transition-colors focus-visible:ring-2 focus-visible:ring-red-500 focus:outline-none"
                         title="Delete Expense"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
